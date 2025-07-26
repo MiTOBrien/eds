@@ -78,7 +78,7 @@ onUnmounted(() => {
             <button class="dropdown-item" @click="viewProfile">
               View Profile
             </button>
-            <button class="dropdown-item logout-item" @click="logout">
+            <button class="dropdown-item" @click="logout">
               Logout
             </button>
           </div>
@@ -90,6 +90,7 @@ onUnmounted(() => {
       </template>
     </div>
   </nav>
+   <h1>Early Draft Society</h1>
 </template>
 
 <style scoped>

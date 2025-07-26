@@ -37,7 +37,8 @@ const login = async () => {
         token: token,
         id: data.status.data.user.id,
         username: data.status.data.user.username,
-        name: data.status.data.user.name,
+        first_name: data.status.data.user.first_name,
+        last_name: data.status.data.user.last_name,
         email: data.status.data.user.email,
       })
 
