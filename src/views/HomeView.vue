@@ -5,6 +5,6 @@ import NavbarView from './NavbarView.vue';
 <template>
   <main>
     <NavbarView />
-    <h2>Home Page</h2>
+    <h3>Home Page</h3>
   </main>
 </template>
