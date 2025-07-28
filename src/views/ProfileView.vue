@@ -25,7 +25,7 @@ onMounted(() => {
 
     <div class="content-wrapper">
       <header class="profile-header">
-        <h2>User Profile</h2>
+        <h3>User Profile</h3>
         <p class="subtitle">Manage your account information and preferences</p>
       </header>
 

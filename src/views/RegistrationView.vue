@@ -79,6 +79,7 @@ const register = async () => {
 <template>
   <main>
     <h1>Early Draft Society</h1>
+    <h2>Building Better Books Together</h2>
     <div class="registration-form">
       <form @submit.prevent="register">
         <div class="form-group">

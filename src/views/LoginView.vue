@@ -66,7 +66,7 @@ const login = async () => {
 <template>
   <main>
     <h1>Early Draft Society</h1>
-
+    <h2>Building Better Books Together</h2>
     <div class="login-form">
       <form @submit.prevent="login">
         <div class="form-group">

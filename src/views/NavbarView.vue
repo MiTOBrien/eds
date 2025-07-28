@@ -91,6 +91,7 @@ onUnmounted(() => {
     </div>
   </nav>
    <h1>Early Draft Society</h1>
+   <h2>Building Better Books Together</h2>
 </template>
 
 <style scoped>

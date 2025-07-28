@@ -19,12 +19,22 @@ h1,
 h2,
 h3 {
   color: #1e3a8a;
+  text-align: center;
 }
 
 h1 {
   font-size: 4rem;
   margin-bottom: 1rem;
-  text-align: center;
+}
+
+h2 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
 }
 
 p {
