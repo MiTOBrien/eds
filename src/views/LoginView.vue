@@ -12,13 +12,13 @@ const userStore = useUserStore()
 
 const login = async () => {
   isLoading.value = true
-  
+
   try {
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        Accept: 'application/json',
       },
       body: JSON.stringify({
         user: {
@@ -40,6 +40,13 @@ const login = async () => {
         first_name: data.status.data.user.first_name,
         last_name: data.status.data.user.last_name,
         email: data.status.data.user.email,
+        roles: data.status.data.user.roles,
+        bio: data.status.data.user.bio,
+        profile_picture: data.status.data.user.profile_picture,
+        professional: data.status.data.user.professional,
+        facebook: data.status.data.user.facebook,
+        x: data.status.data.user.x,
+        instagram: data.status.data.user.instagram,
       })
 
       localStorage.setItem('token', token)
@@ -51,9 +58,11 @@ const login = async () => {
     }
   } catch (error) {
     console.error('Login error:', error)
-    
+
     if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      alert(`Cannot connect to backend at ${API_BASE_URL}. Please check if your backend server is running.`)
+      alert(
+        `Cannot connect to backend at ${API_BASE_URL}. Please check if your backend server is running.`,
+      )
     } else {
       alert(`An error occurred during login: ${error.message}`)
     }
@@ -99,7 +108,7 @@ const login = async () => {
           {{ isLoading ? 'Logging in...' : 'Login' }}
         </button>
       </form>
-      
+
       <p class="register-link">
         Don't have an account? <RouterLink to="/register">Create one here</RouterLink>
       </p>
@@ -109,10 +118,9 @@ const login = async () => {
 
 <style scoped>
 main {
-  max-width: 400px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 2rem;
-  font-family: Arial, sans-serif;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -181,13 +189,9 @@ main {
     padding: 1rem;
     max-width: 100%;
   }
-  
+
   .login-form {
     padding: 1.5rem;
-  }
-  
-  h1 {
-    font-size: 1.5rem;
   }
 }
 </style>

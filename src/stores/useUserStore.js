@@ -7,8 +7,10 @@ export const useUserStore = defineStore('user', {
     last_name: '',
     username: '',
     email: '',
+    roles: [],
     professional: false,
     acknowledgment: false,
+    bio: '',
     facebook: '',
     twitter: '',
     x: '',
@@ -21,6 +23,8 @@ export const useUserStore = defineStore('user', {
       this.last_name = user.last_name || ''
       this.username = user.username || ''
       this.email = user.email
+      this.roles = user.roles || []
+      this.bio = user.bio || ''
       this.professional = user.professional || false
       this.acknowledgment = user.acknowledgment || false
       this.facebook = user.facebook || ''
@@ -33,6 +37,8 @@ export const useUserStore = defineStore('user', {
       localStorage.setItem('last_name', this.last_name)
       localStorage.setItem('username', this.username)
       localStorage.setItem('email', this.email)
+      localStorage.setItem('roles', JSON.stringify(this.roles))
+      localStorage.setItem('bio', this.bio)
       localStorage.setItem('professional', this.professional)
       localStorage.setItem('acknowledgment', this.acknowledgment)
       localStorage.setItem('facebook', this.facebook)
@@ -46,6 +52,8 @@ export const useUserStore = defineStore('user', {
       this.last_name = ''
       this.username = ''
       this.email = ''
+      this.roles = []
+      this.bio = ''
       this.professional = false
       this.acknowledgment = false
       this.facebook = ''
@@ -62,6 +70,8 @@ export const useUserStore = defineStore('user', {
       this.last_name = localStorage.getItem('last_name') || ''
       this.username = localStorage.getItem('username') || ''
       this.email = localStorage.getItem('email')
+      this.roles = JSON.parse(localStorage.getItem('roles')) || []
+      this.bio = localStorage.getItem('bio') || ''
       this.professional = localStorage.getItem('professional') === 'true'
       this.acknowledgment = localStorage.getItem('acknowledgment') === 'true'
       this.facebook = localStorage.getItem('facebook') || ''
