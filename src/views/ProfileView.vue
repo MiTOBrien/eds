@@ -11,8 +11,8 @@ const selectedRoles = ref([])
 const initializeRoles = () => {
   if (userStore.roles && Array.isArray(userStore.roles)) {
     // Extract role names from role objects if they're objects, or use directly if they're strings
-    selectedRoles.value = userStore.roles.map((role) =>
-      typeof role === 'object' ? role.name : role,
+    selectedRoles.value = userStore.roles.map((roleObj) =>
+      typeof roleObj === 'object' ? roleObj.role.toLowerCase() : roleObj.toLowerCase(),
     )
   }
 }
