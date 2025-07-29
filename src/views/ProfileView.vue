@@ -7,15 +7,26 @@ const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
 const selectedRoles = ref([])
 
+// Initialize selectedRoles with user's existing roles
+const initializeRoles = () => {
+  if (userStore.roles && Array.isArray(userStore.roles)) {
+    // Extract role names from role objects if they're objects, or use directly if they're strings
+    selectedRoles.value = userStore.roles.map((role) =>
+      typeof role === 'object' ? role.name : role,
+    )
+  }
+}
+
 // Computed property to check if user selected any reader roles
 const isReaderRole = computed(() => {
   return selectedRoles.value.some((role) =>
-    ['arcreader', 'betareader', 'proofreader'].includes(role),
+    ['author', 'arcreader', 'betareader', 'proofreader'].includes(role),
   )
 })
 
 onMounted(() => {
   userStore.restoreFromLocalStorage()
+  initializeRoles() // Initialize roles after restoring from localStorage
 })
 </script>
 
@@ -137,11 +148,23 @@ onMounted(() => {
                   <h4>Are you a Professional?</h4>
                   <div class="radio-group">
                     <div class="radio-option">
-                      <input type="radio" id="yes" name="professional" value="yes" />
+                      <input
+                        type="radio"
+                        id="yes"
+                        name="professional"
+                        value="true"
+                        v-model="userStore.professional"
+                      />
                       <label for="yes">Yes</label>
                     </div>
                     <div class="radio-option">
-                      <input type="radio" id="no" name="professional" value="no" />
+                      <input
+                        type="radio"
+                        id="no"
+                        name="professional"
+                        value="false"
+                        v-model="userStore.professional"
+                      />
                       <label for="no">No</label>
                     </div>
                   </div>
@@ -233,7 +256,7 @@ onMounted(() => {
 }
 
 .content-wrapper {
-  max-width: 900px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }

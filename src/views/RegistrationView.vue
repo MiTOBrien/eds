@@ -234,7 +234,7 @@ const register = async () => {
 
 <style scoped>
 main {
-  max-width: 700px;
+  max-width: 600px;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -470,8 +470,6 @@ main {
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-top: 1rem;
-  background-color: #007bff;
-  color: white;
 }
 
 .submit-btn:hover {
