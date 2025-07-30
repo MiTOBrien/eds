@@ -97,7 +97,7 @@ onMounted(() => {
         <!-- Roles Section -->
         <section class="form-section">
           <fieldset class="roles-fieldset">
-            <legend>Register as:</legend>
+            <legend>Update Roles:</legend>
 
             <div class="roles-container">
               <div class="roles-grid">
@@ -134,60 +134,6 @@ onMounted(() => {
                     v-model="selectedRoles"
                   />
                   <label for="proofreader">Proof Reader</label>
-                </div>
-              </div>
-
-              <div v-if="isReaderRole" class="professional-section">
-                <div class="info-box">
-                  <p>
-                    <strong>Note:</strong> Non-professional ARC/Beta/Proof readers are listed for
-                    free.
-                  </p>
-                  <p>
-                    For the purposes of this website, you are a professional if you charge for your
-                    services.
-                  </p>
-                </div>
-
-                <div class="professional-options">
-                  <h4>Are you a Professional?</h4>
-                  <div class="radio-group">
-                    <div class="radio-option">
-                      <input
-                        type="radio"
-                        id="yes"
-                        name="professional"
-                        value="true"
-                        v-model="userStore.professional"
-                      />
-                      <label for="yes">Yes</label>
-                    </div>
-                    <div class="radio-option">
-                      <input
-                        type="radio"
-                        id="no"
-                        name="professional"
-                        value="false"
-                        v-model="userStore.professional"
-                      />
-                      <label for="no">No</label>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="acknowledgement">
-                  <div class="checkbox-wrapper">
-                    <input
-                      type="checkbox"
-                      id="acknowledgement"
-                      name="acknowledgement"
-                      value="agree"
-                    />
-                    <label for="acknowledgement">
-                      I acknowledge that if I register as a non-professional and am reported for
-                      requesting payment, my account will be deleted.
-                    </label>
-                  </div>
                 </div>
               </div>
             </div>
