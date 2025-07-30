@@ -20,7 +20,7 @@ const initializeRoles = () => {
 // Computed property to check if user selected any reader roles
 const isReaderRole = computed(() => {
   return selectedRoles.value.some((role) =>
-    ['author', 'arcreader', 'betareader', 'proofreader'].includes(role),
+    ['arc reader', 'beta reader', 'proof reader'].includes(role),
   )
 })
 
@@ -107,7 +107,12 @@ onMounted(() => {
                 </div>
 
                 <div class="role-option">
-                  <input type="checkbox" id="arcreader" value="arcreader" v-model="selectedRoles" />
+                  <input
+                    type="checkbox"
+                    id="arcreader"
+                    value="arc reader"
+                    v-model="selectedRoles"
+                  />
                   <label for="arcreader">ARC Reader</label>
                 </div>
 
@@ -115,7 +120,7 @@ onMounted(() => {
                   <input
                     type="checkbox"
                     id="betareader"
-                    value="betareader"
+                    value="beta reader"
                     v-model="selectedRoles"
                   />
                   <label for="betareader">Beta Reader</label>
@@ -125,7 +130,7 @@ onMounted(() => {
                   <input
                     type="checkbox"
                     id="proofreader"
-                    value="proofreader"
+                    value="proof reader"
                     v-model="selectedRoles"
                   />
                   <label for="proofreader">Proof Reader</label>
