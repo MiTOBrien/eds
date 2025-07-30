@@ -10,13 +10,14 @@ const confirmPassword = ref('')
 const selectedRoles = ref([])
 const chargesForServices = ref(false)
 const subscriptionPlan = ref('monthly') // 'monthly' or 'annual'
+const freePlanAcknowledgment = ref(false) // New reactive ref for acknowledgment
 const router = useRouter()
 const userStore = useUserStore()
 
 // Computed property to determine if user needs paid subscription
 const needsPaidSubscription = computed(() => {
   const paidRoles = ['arcreader', 'betareader', 'proofreader']
-  const hasPaidRole = selectedRoles.value.some(role => paidRoles.includes(role))
+  const hasPaidRole = selectedRoles.value.some((role) => paidRoles.includes(role))
   return hasPaidRole && chargesForServices.value
 })
 
@@ -43,6 +44,12 @@ const register = async () => {
 
   if (selectedRoles.value.length === 0) {
     alert('Please select at least one role')
+    return
+  }
+
+  // Check free plan acknowledgment when applicable
+  if (!needsPaidSubscription.value && !freePlanAcknowledgment.value) {
+    alert('Please acknowledge the free plan terms')
     return
   }
 
@@ -151,12 +158,22 @@ const register = async () => {
         </div>
 
         <!-- Service Pricing Question -->
-        <div class="form-group" v-if="selectedRoles.some(role => ['arcreader', 'betareader', 'proofreader'].includes(role))">
+        <div
+          class="form-group"
+          v-if="
+            selectedRoles.some((role) => ['arcreader', 'betareader', 'proofreader'].includes(role))
+          "
+        >
           <fieldset class="service-pricing-fieldset">
             <legend>Do you charge authors for your services?</legend>
             <div class="pricing-options">
               <div class="pricing-option">
-                <input type="radio" id="free-services" :value="false" v-model="chargesForServices" />
+                <input
+                  type="radio"
+                  id="free-services"
+                  :value="false"
+                  v-model="chargesForServices"
+                />
                 <label for="free-services">No, I provide free services</label>
               </div>
               <div class="pricing-option">
@@ -171,7 +188,7 @@ const register = async () => {
         <div class="form-group">
           <fieldset class="subscription-fieldset">
             <legend>Subscription Plan:</legend>
-            
+
             <!-- Free Account Display -->
             <div v-if="!needsPaidSubscription" class="subscription-info free-plan">
               <div class="plan-details">
@@ -181,17 +198,39 @@ const register = async () => {
                   For authors and readers who provide free services to the community.
                 </p>
               </div>
+
+              <!-- Free Plan Acknowledgment -->
+              <div class="acknowledgment-wrapper">
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    id="free-plan-acknowledgment"
+                    v-model="freePlanAcknowledgment"
+                    required
+                  />
+                  <label for="free-plan-acknowledgment">
+                    I acknowledge that if I register as a non-professional and am reported for
+                    requesting payment, my account will be deleted.
+                  </label>
+                </div>
+              </div>
             </div>
 
             <!-- Paid Account Options -->
             <div v-else class="subscription-options">
               <p class="subscription-note">
-                Since you charge for your services, a paid subscription is required to access our platform.
+                Since you charge for your services, a paid subscription is required to access our
+                platform.
               </p>
-              
+
               <div class="plan-options">
                 <div class="plan-option" :class="{ active: subscriptionPlan === 'monthly' }">
-                  <input type="radio" id="monthly-plan" value="monthly" v-model="subscriptionPlan" />
+                  <input
+                    type="radio"
+                    id="monthly-plan"
+                    value="monthly"
+                    v-model="subscriptionPlan"
+                  />
                   <label for="monthly-plan" class="plan-label">
                     <div class="plan-details">
                       <h3>Monthly Plan</h3>
@@ -366,6 +405,37 @@ main {
 .subscription-info .plan-description {
   margin: 0.5rem 0 0 0;
   color: #555;
+}
+
+/* Free Plan Acknowledgment Styles */
+.acknowledgment-wrapper {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #c8e6c9;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.checkbox-wrapper input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #4caf50;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.checkbox-wrapper label {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #2e7d32;
+  font-weight: 500;
+  cursor: pointer;
+  margin: 0;
 }
 
 .subscription-note {
