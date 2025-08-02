@@ -43,16 +43,44 @@ const fetchReaders = async () => {
     loading.value = true
     error.value = null
 
+    // Check if user is authenticated and has token
+    if (!userStore.token) {
+      error.value = 'Please log in to view readers'
+      return
+    }
+
+    // Debug: Log the actual token value (first 20 characters for security)
+    console.log('Token preview:', userStore.token ? userStore.token.substring(0, 20) + '...' : 'No token')
+    console.log('Token type:', typeof userStore.token)
+    console.log('Token length:', userStore.token ? userStore.token.length : 0)
+    
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${userStore.token}`
+    }
+    
+    console.log('Request headers:', headers)
+
     const response = await fetch(`${API_BASE_URL}/readers`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userStore.token}` // Assuming you store auth token
-      }
+      headers: headers
     })
 
+    console.log('Response status:', response.status)
+    console.log('Response headers:', response.headers)
+
     if (!response.ok) {
-      throw new Error('Failed to fetch readers')
+      // Get the response body for more error details
+      const errorData = await response.text()
+      console.log('Error response body:', errorData)
+      
+      if (response.status === 401) {
+        error.value = 'Authentication failed. Please log in again.'
+        // Optionally redirect to login
+        // router.push('/login')
+        return
+      }
+      throw new Error(`HTTP ${response.status}: Failed to fetch readers`)
     }
 
     const data = await response.json()
@@ -116,8 +144,8 @@ onMounted(() => {
 
 <template>
   <main class="reader-directory">
-    <NavbarView />
     <div class="header-section">
+      <NavbarView />
       <h3>Find Your Perfect Reader</h3>
       <p class="subtitle">Connect with experienced ARC readers, beta readers, and proofreaders</p>
     </div>
@@ -138,9 +166,9 @@ onMounted(() => {
           <label for="role-filter">Reader Type:</label>
           <select v-model="selectedRoleFilter" id="role-filter" class="filter-select">
             <option value="all">All Types</option>
-            <option value="arcreader">ARC Readers</option>
-            <option value="betareader">Beta Readers</option>
-            <option value="proofreader">Proofreaders</option>
+            <option value="Arc Reader">ARC Readers</option>
+            <option value="Beta Reader">Beta Readers</option>
+            <option value="Proof Reader">Proofreaders</option>
           </select>
         </div>
 
