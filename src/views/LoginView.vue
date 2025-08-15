@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
 import { useUserStore } from '@/stores/useUserStore'
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
@@ -28,32 +28,26 @@ const login = async () => {
       }),
     })
 
-    const data = await response.json()
+    const result = await response.json()
 
-    const token = data.status?.token
+    const token = result.status?.token
+    const user = result.status?.data?.user
 
-    if (response.ok && token) {
-      userStore.setUser({
-        token: token,
-        id: data.status.data.user.id,
-        username: data.status.data.user.username,
-        first_name: data.status.data.user.first_name,
-        last_name: data.status.data.user.last_name,
-        email: data.status.data.user.email,
-        roles: data.status.data.user.roles,
-        bio: data.status.data.user.bio,
-        profile_picture: data.status.data.user.profile_picture,
-        professional: data.status.data.user.professional,
-        facebook: data.status.data.user.facebook,
-        x: data.status.data.user.x,
-        instagram: data.status.data.user.instagram,
-      })
+    if (response.ok && token && user) {
+      // Combine token with user data
+      const fullUser = {
+        ...user,
+        token,
+      }
 
-      localStorage.setItem('token', token)
+      // Store in Pinia and localStorage
+      userStore.setUser(fullUser)
 
+      // Redirect to /home
       router.push('/home')
     } else {
-      const errorMessage = data.error || data.message || 'Login failed'
+      const errorMessage =
+        result.error || result.status?.message || 'Login failed. Please try again.'
       alert(errorMessage)
     }
   } catch (error) {

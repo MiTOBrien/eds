@@ -7,13 +7,18 @@ const router = useRouter()
 const userStore = useUserStore()
 const isDropdownOpen = ref(false)
 
+const username = computed(() => userStore.username)
+const firstName = computed(() => userStore.first_name)
+const lastName = computed(() => userStore.last_name)
+const email = computed(() => userStore.email)
+
 // Computed property to get the display name (username, full name, or email as fallback)
 const displayName = computed(() => {
-  if (userStore.username) return userStore.username
-  if (userStore.first_name && userStore.last_name) {
-    return `${userStore.first_name} ${userStore.last_name}`
+  if (username.value) return username.value
+  if (firstName.value && lastName.value) {
+    return `${firstName.value} ${lastName.value}`
   }
-  return userStore.email || 'User'
+  return email.value || 'User'
 })
 
 const isLoggedIn = computed(() => userStore.isLoggedIn)
@@ -44,8 +49,8 @@ const handleClickOutside = (event) => {
   }
 }
 
-onMounted(() => {
-  userStore.restoreFromLocalStorage()
+onMounted(async () => {
+  await userStore.restoreFromLocalStorage()
   document.addEventListener('click', handleClickOutside)
 })
 
@@ -65,34 +70,25 @@ onUnmounted(() => {
     <div class="navbar-right">
       <template v-if="isLoggedIn">
         <div class="user-dropdown">
-          <button 
-            class="user-button" 
-            @click="toggleDropdown"
-            :class="{ active: isDropdownOpen }"
-          >
+          <button class="user-button" @click="toggleDropdown" :class="{ active: isDropdownOpen }">
             {{ displayName }}
             <span class="dropdown-arrow" :class="{ rotated: isDropdownOpen }">▼</span>
           </button>
-          
+
           <div class="dropdown-menu" :class="{ show: isDropdownOpen }">
-            <button class="dropdown-item" @click="viewProfile">
-              View Profile
-            </button>
-            <button class="dropdown-item" @click="logout">
-              Logout
-            </button>
+            <button class="dropdown-item" @click="viewProfile">View Profile</button>
+            <button class="dropdown-item" @click="logout">Logout</button>
           </div>
         </div>
       </template>
-      
+
       <template v-else>
         <RouterLink class="nav-link login-link" to="/">Login</RouterLink>
       </template>
     </div>
   </nav>
-   <h1>Early Draft Society</h1>
-   <h2>Building Better Books Together</h2>
+  <h1>Early Draft Society</h1>
+  <h2>Building Better Books Together</h2>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
