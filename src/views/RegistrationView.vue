@@ -102,6 +102,42 @@ const register = async () => {
         </div>
 
         <div class="form-group">
+          <label for="username">Username:</label>
+          <input
+            v-model="username"
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Enter your username"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="first_name">First Name:</label>
+          <input
+            v-model="first_name"
+            type="text"
+            id="first_name"
+            name="first_name"
+            placeholder="Enter your first name"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="last_name">Last Name:</label>
+          <input
+            v-model="last_name"
+            type="text"
+            id="last_name"
+            name="last_name"
+            placeholder="Enter your last name"
+            required
+          />
+        </div>
+
+        <div class="form-group">
           <label for="password">Password:</label>
           <input
             v-model="password"
@@ -297,7 +333,8 @@ main {
 }
 
 .form-group input[type='email'],
-.form-group input[type='password'] {
+.form-group input[type='password'],
+.form-group input[type='text'] {
   width: 100%;
   padding: 0.75rem;
   border: 2px solid #ddd;
