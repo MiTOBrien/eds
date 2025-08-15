@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/useUserStore'
 import NavbarView from './NavbarView.vue'
 
@@ -7,6 +7,7 @@ const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
 
 // Reactive data
+const token = computed(() => userStore.token)
 const readers = ref([])
 const loading = ref(true)
 const error = ref(null)
@@ -14,22 +15,27 @@ const searchQuery = ref('')
 const selectedRoleFilter = ref('all')
 const selectedServiceFilter = ref('all')
 
+
 // Computed properties
 const filteredReaders = computed(() => {
-  return readers.value.filter(reader => {
-    // Text search filter
-    const matchesSearch = searchQuery.value === '' || 
+  return readers.value.filter((reader) => {
+    const matchesSearch =
+      searchQuery.value === '' ||
       reader.username?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       reader.first_name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       reader.last_name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       reader.bio?.toLowerCase().includes(searchQuery.value.toLowerCase())
 
-    // Role filter
-    const matchesRole = selectedRoleFilter.value === 'all' || 
-      reader.roles.includes(selectedRoleFilter.value)
+    const roleNames = Array.isArray(reader.roles)
+      ? reader.roles.map((r) => (typeof r === 'string' ? r : r.role))
+      : []
 
-    // Service type filter (free vs paid)
-    const matchesService = selectedServiceFilter.value === 'all' ||
+    const matchesRole =
+      selectedRoleFilter.value === 'all' ||
+      roleNames.includes(selectedRoleFilter.value)
+
+    const matchesService =
+      selectedServiceFilter.value === 'all' ||
       (selectedServiceFilter.value === 'free' && !reader.charges_for_services) ||
       (selectedServiceFilter.value === 'paid' && reader.charges_for_services)
 
@@ -39,48 +45,26 @@ const filteredReaders = computed(() => {
 
 // Methods
 const fetchReaders = async () => {
+  console.log('Fetching readers...')
   try {
     loading.value = true
     error.value = null
 
-    // Check if user is authenticated and has token
     if (!userStore.token) {
       error.value = 'Please log in to view readers'
       return
     }
 
-    // Debug: Log the actual token value (first 20 characters for security)
-    console.log('Token preview:', userStore.token ? userStore.token.substring(0, 20) + '...' : 'No token')
-    console.log('Token type:', typeof userStore.token)
-    console.log('Token length:', userStore.token ? userStore.token.length : 0)
-    
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${userStore.token}`
-    }
-    
-    console.log('Request headers:', headers)
-
     const response = await fetch(`${API_BASE_URL}/readers`, {
       method: 'GET',
-      headers: headers
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+      },
     })
 
-    console.log('Response status:', response.status)
-    console.log('Response headers:', response.headers)
-
     if (!response.ok) {
-      // Get the response body for more error details
       const errorData = await response.text()
-      console.log('Error response body:', errorData)
-      
-      if (response.status === 401) {
-        error.value = 'Authentication failed. Please log in again.'
-        // Optionally redirect to login
-        // router.push('/login')
-        return
-      }
-      throw new Error(`HTTP ${response.status}: Failed to fetch readers`)
+      throw new Error(`HTTP ${response.status}: ${errorData}`)
     }
 
     const data = await response.json()
@@ -95,36 +79,44 @@ const fetchReaders = async () => {
 
 const getReaderRoles = (roles) => {
   const roleLabels = {
-    'arcreader': 'ARC Reader',
-    'betareader': 'Beta Reader',
-    'proofreader': 'Proofreader'
+    arcreader: 'ARC Reader',
+    betareader: 'Beta Reader',
+    proofreader: 'Proofreader',
   }
-  
+
   return roles
-    .filter(role => ['arcreader', 'betareader', 'proofreader'].includes(role))
-    .map(role => roleLabels[role])
+    .filter((role) => ['arcreader', 'betareader', 'proofreader'].includes(role))
+    .map((role) => roleLabels[role])
     .join(', ')
 }
 
 const getProfileImageUrl = (reader) => {
   if (reader.profile_photo) {
     // If it's a full URL, use as-is; otherwise, prepend base URL
-    return reader.profile_photo.startsWith('http') 
-      ? reader.profile_photo 
+    return reader.profile_photo.startsWith('http')
+      ? reader.profile_photo
       : `${API_BASE_URL}${reader.profile_photo}`
   }
   return '/default-avatar.png' // Fallback to default avatar
 }
 
+const handleImageError = (event) => {
+  const img = event.target
+  if (!img.dataset.fallback) {
+    img.src = '/default-avatar.png'
+    img.dataset.fallback = 'true' // prevent infinite loop
+  }
+}
+
 const formatSocialLink = (platform, handle) => {
   if (!handle) return null
-  
+
   const baseUrls = {
     facebook: 'https://facebook.com/',
     instagram: 'https://instagram.com/',
-    x: 'https://x.com/'
+    x: 'https://x.com/',
   }
-  
+
   // Remove @ if present and clean the handle
   const cleanHandle = handle.replace('@', '').trim()
   return baseUrls[platform] + cleanHandle
@@ -138,7 +130,13 @@ const clearFilters = () => {
 
 // Lifecycle
 onMounted(() => {
-  fetchReaders()
+  console.log('HomeView mounted')
+  // userStore.restoreFromLocalStorage()
+  if (userStore.token) fetchReaders()
+})
+
+onUnmounted(() => {
+  console.log('HomeView unmounted')
 })
 </script>
 
@@ -146,8 +144,11 @@ onMounted(() => {
   <main class="reader-directory">
     <div class="header-section">
       <NavbarView />
+      <hr />
       <h3>Find Your Perfect Reader</h3>
       <p class="subtitle">Connect with experienced ARC readers, beta readers, and proofreaders</p>
+      <p v-if="token">Token: {{ token }}</p>
+      <p v-else>No token found</p>
     </div>
 
     <!-- Search and Filter Section -->
@@ -160,7 +161,7 @@ onMounted(() => {
           class="search-input"
         />
       </div>
-      
+
       <div class="filters">
         <div class="filter-group">
           <label for="role-filter">Reader Type:</label>
@@ -206,19 +207,17 @@ onMounted(() => {
       <div v-for="reader in filteredReaders" :key="reader.id" class="reader-card">
         <!-- Profile Photo -->
         <div class="reader-photo">
-          <img 
-            :src="getProfileImageUrl(reader)" 
+          <img
+            :src="getProfileImageUrl(reader)"
             :alt="`${reader.first_name} ${reader.last_name}`"
-            @error="$event.target.src='/default-avatar.png'"
+            @error="handleImageError($event)"
           />
         </div>
 
         <!-- Reader Info -->
         <div class="reader-info">
           <div class="reader-header">
-            <h3 class="reader-name">
-              {{ reader.first_name }} {{ reader.last_name }}
-            </h3>
+            <h3 class="reader-name">{{ reader.first_name }} {{ reader.last_name }}</h3>
             <p class="reader-username">@{{ reader.username }}</p>
             <div class="reader-roles">
               {{ getReaderRoles(reader.roles) }}
@@ -231,7 +230,7 @@ onMounted(() => {
           <!-- Contact Info -->
           <div class="contact-info">
             <p class="email">
-              <strong>Email:</strong> 
+              <strong>Email:</strong>
               <a :href="`mailto:${reader.email}`">{{ reader.email }}</a>
             </p>
           </div>
@@ -242,10 +241,13 @@ onMounted(() => {
           </div>
 
           <!-- Social Links -->
-          <div class="social-links" v-if="reader.facebook_handle || reader.instagram_handle || reader.x_handle">
+          <div
+            class="social-links"
+            v-if="reader.facebook_handle || reader.instagram_handle || reader.x_handle"
+          >
             <h4>Connect:</h4>
             <div class="social-buttons">
-              <a 
+              <a
                 v-if="reader.facebook_handle"
                 :href="formatSocialLink('facebook', reader.facebook_handle)"
                 target="_blank"
@@ -255,8 +257,8 @@ onMounted(() => {
                 <span class="social-icon">📘</span>
                 Facebook
               </a>
-              
-              <a 
+
+              <a
                 v-if="reader.instagram_handle"
                 :href="formatSocialLink('instagram', reader.instagram_handle)"
                 target="_blank"
@@ -266,8 +268,8 @@ onMounted(() => {
                 <span class="social-icon">📷</span>
                 Instagram
               </a>
-              
-              <a 
+
+              <a
                 v-if="reader.x_handle"
                 :href="formatSocialLink('x', reader.x_handle)"
                 target="_blank"
@@ -389,7 +391,9 @@ onMounted(() => {
 }
 
 /* Loading and Error States */
-.loading-state, .error-state, .no-results {
+.loading-state,
+.error-state,
+.no-results {
   text-align: center;
   padding: 3rem;
   color: #666;
@@ -422,7 +426,9 @@ onMounted(() => {
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .reader-card:hover {

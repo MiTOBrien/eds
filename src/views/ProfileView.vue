@@ -6,11 +6,13 @@ import NavbarView from './NavbarView.vue'
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
 const selectedRoles = ref([])
+const updateStatus = ref('') // Optional: for feedback messages
+
+const token = computed(() => userStore.token)
 
 // Initialize selectedRoles with user's existing roles
 const initializeRoles = () => {
   if (userStore.roles && Array.isArray(userStore.roles)) {
-    // Extract role names from role objects if they're objects, or use directly if they're strings
     selectedRoles.value = userStore.roles.map((roleObj) =>
       typeof roleObj === 'object' ? roleObj.role.toLowerCase() : roleObj.toLowerCase(),
     )
@@ -24,23 +26,67 @@ const isReaderRole = computed(() => {
   )
 })
 
+// Submit handler
+const handleSubmit = async (event) => {
+  event.preventDefault()
+
+  try {
+    const token = localStorage.getItem('jwt') // Adjust if stored differently
+    console.log('JWT:', token)
+    const response = await fetch(`${API_BASE_URL}/users/${userStore.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        user: {
+          username: userStore.username,
+          first_name: userStore.first_name,
+          last_name: userStore.last_name,
+          roles: selectedRoles.value,
+          facebook: userStore.facebook,
+          instagram: userStore.instagram,
+          x: userStore.x,
+          bio: userStore.bio,
+        },
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to update profile')
+    }
+
+    const updatedUser = await response.json()
+    userStore.setUser(updatedUser) // Assuming you have a method to update store
+    updateStatus.value = 'Profile updated successfully!'
+  } catch (error) {
+    console.error(error)
+    updateStatus.value = 'Error updating profile. Please try again.'
+  }
+}
+
 onMounted(() => {
   userStore.restoreFromLocalStorage()
-  initializeRoles() // Initialize roles after restoring from localStorage
+  initializeRoles()
 })
 </script>
 
 <template>
   <main class="profile-container">
     <NavbarView />
+    <hr />
+    <p v-if="updateStatus" class="update-message">{{ updateStatus }}</p>
 
     <div class="content-wrapper">
       <header class="profile-header">
         <h3>User Profile</h3>
         <p class="subtitle">Manage your account information and preferences</p>
+        <p v-if="token">Token: {{ token }}</p>
+        <p v-else>No token found</p>
       </header>
 
-      <form class="profile-form">
+      <form class="profile-form" @submit="handleSubmit">
         <!-- Personal Information Section -->
         <section class="form-section">
           <fieldset class="info-fieldset">
@@ -200,283 +246,4 @@ onMounted(() => {
   </main>
 </template>
 
-<style scoped>
-.profile-container {
-  min-height: 100vh;
-  background-color: #f8f9fa;
-}
-
-.content-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-.profile-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.profile-header h2 {
-  color: #333;
-  margin-bottom: 0.5rem;
-  font-size: 2rem;
-}
-
-.subtitle {
-  color: #666;
-  font-size: 1.1rem;
-  margin: 0;
-}
-
-.profile-form {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.form-section {
-  width: 100%;
-}
-
-.info-fieldset,
-.roles-fieldset {
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin: 0;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.info-fieldset legend,
-.roles-fieldset legend {
-  font-weight: 600;
-  color: #555;
-  padding: 0 1rem;
-  font-size: 1.1rem;
-}
-
-.fields-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-top: 1rem;
-}
-
-.profile-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.bio-field {
-  grid-column: 1 / -1;
-}
-
-.profile-field label {
-  font-weight: 500;
-  color: #555;
-  font-size: 0.9rem;
-}
-
-.profile-field input,
-.profile-field textarea {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.2s ease;
-}
-
-.profile-field input:focus,
-.profile-field textarea:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.input-disabled {
-  background-color: #f8f9fa;
-  color: #6c757d;
-  cursor: not-allowed;
-}
-
-.profile-field textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-.roles-container {
-  margin-top: 1rem;
-}
-
-.roles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.role-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-}
-
-.role-option:hover {
-  background-color: #f8f9fa;
-}
-
-.role-option input[type='checkbox'] {
-  width: 18px;
-  height: 18px;
-  accent-color: #007bff;
-}
-
-.role-option label {
-  margin: 0;
-  font-weight: normal;
-  cursor: pointer;
-}
-
-.professional-section {
-  border-top: 1px solid #eee;
-  padding-top: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.info-box {
-  background-color: #f8f9fa;
-  border-left: 4px solid #007bff;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  border-radius: 0 4px 4px 0;
-}
-
-.info-box p {
-  margin: 0.5rem 0;
-  color: #555;
-}
-
-.professional-options h4 {
-  margin-bottom: 0.75rem;
-  color: #555;
-}
-
-.radio-group {
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.radio-option input[type='radio'] {
-  width: 18px;
-  height: 18px;
-  accent-color: #007bff;
-}
-
-.radio-option label {
-  cursor: pointer;
-  font-weight: normal;
-}
-
-.acknowledgement {
-  background-color: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 4px;
-  padding: 1rem;
-}
-
-.checkbox-wrapper {
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
-}
-
-.checkbox-wrapper input[type='checkbox'] {
-  width: 18px;
-  height: 18px;
-  margin-top: 0.2rem;
-  flex-shrink: 0;
-  accent-color: #007bff;
-}
-
-.checkbox-wrapper label {
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #856404;
-  cursor: pointer;
-}
-
-.button-wrapper {
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.submit-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 0.75rem 2rem;
-  font-size: 1.1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  min-width: 200px;
-}
-
-.submit-btn:hover {
-  background-color: #0056b3;
-}
-
-.submit-btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .content-wrapper {
-    padding: 1rem;
-  }
-
-  .fields-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .roles-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .radio-group {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .profile-header h2 {
-    font-size: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .content-wrapper {
-    padding: 0.5rem;
-  }
-
-  .info-fieldset,
-  .roles-fieldset {
-    padding: 1rem;
-  }
-}
-</style>
+<style scoped></style>
