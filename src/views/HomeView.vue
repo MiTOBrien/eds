@@ -45,7 +45,6 @@ const filteredReaders = computed(() => {
 
 // Methods
 const fetchReaders = async () => {
-  console.log('Fetching readers...')
   try {
     loading.value = true
     error.value = null
@@ -97,14 +96,14 @@ const getProfileImageUrl = (reader) => {
       ? reader.profile_photo
       : `${API_BASE_URL}${reader.profile_photo}`
   }
-  return '/default-avatar.png' // Fallback to default avatar
+  return '/default-avatar.png'
 }
 
 const handleImageError = (event) => {
   const img = event.target
   if (!img.dataset.fallback) {
     img.src = '/default-avatar.png'
-    img.dataset.fallback = 'true' // prevent infinite loop
+    img.dataset.fallback = 'true'
   }
 }
 
@@ -130,8 +129,6 @@ const clearFilters = () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('HomeView mounted')
-  // userStore.restoreFromLocalStorage()
   if (userStore.token) fetchReaders()
 })
 
