@@ -68,6 +68,7 @@ const handleSubmit = async (event) => {
 
 onMounted(() => {
   userStore.restoreFromLocalStorage()
+  console.log('User roles:', userStore.roles)
   initializeRoles()
 })
 </script>

@@ -38,12 +38,12 @@ const login = async () => {
       const fullUser = {
         ...user,
         token,
+        roles: Array.isArray(user.roles) ? user.roles : [],
       }
 
       // Store in Pinia and localStorage
       userStore.setUser(fullUser)
 
-      // Redirect to /home
       router.push('/home')
     } else {
       const errorMessage =

@@ -14,6 +14,7 @@ export const useUserStore = defineStore('user', {
     instagram: '',
     x: '',
     isLoggedIn: false,
+    roles: [],
   }),
   actions: {
     login(userData) {
@@ -28,12 +29,16 @@ export const useUserStore = defineStore('user', {
       this.facebook = userData.facebook || ''
       this.instagram = userData.instagram || ''
       this.x = userData.x || ''
+      this.roles = userData.roles || [] 
       this.isLoggedIn = true
+
       localStorage.setItem('user', JSON.stringify(userData))
     },
+
     setUser(userData) {
       this.login(userData)
     },
+
     logout() {
       this.token = null
       this.username = ''
@@ -46,9 +51,12 @@ export const useUserStore = defineStore('user', {
       this.facebook = ''
       this.instagram = ''
       this.x = ''
+      this.roles = []
       this.isLoggedIn = false
+
       localStorage.removeItem('user')
     },
+
     restoreFromLocalStorage() {
       const stored = localStorage.getItem('user')
       if (stored) {
@@ -64,6 +72,7 @@ export const useUserStore = defineStore('user', {
         this.facebook = userData.facebook || ''
         this.instagram = userData.instagram || ''
         this.x = userData.x || ''
+        this.roles = userData.roles || []
         this.isLoggedIn = true
       }
     },
