@@ -5,6 +5,9 @@ import { useUserStore } from '@/stores/useUserStore'
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const email = ref('')
+const username = ref('')
+const first_name = ref('')
+const last_name = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const selectedRoles = ref([])
@@ -60,6 +63,9 @@ const register = async () => {
       body: JSON.stringify({
         user: {
           email: email.value,
+          username: username.value,
+          first_name: first_name.value,
+          last_name: last_name.value,
           password: password.value,
           roles: selectedRoles.value,
           subscription_type: subscriptionType.value,
