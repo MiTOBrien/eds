@@ -193,35 +193,35 @@ onMounted(() => {
 
             <div class="fields-grid">
               <div class="profile-field">
-                <label for="facebook">Facebook:</label>
+                <label for="facebook">https://www.facebook.com/</label>
                 <input
                   type="text"
                   v-model="userStore.facebook"
                   id="facebook"
                   name="facebook"
-                  placeholder="Facebook account link - Optional"
+                  placeholder="Facebook ID - Optional"
                 />
               </div>
 
               <div class="profile-field">
-                <label for="instagram">Instagram:</label>
+                <label for="instagram">https://www.instagram.com/</label>
                 <input
                   type="text"
                   v-model="userStore.instagram"
                   id="instagram"
                   name="instagram"
-                  placeholder="Instagram account link - Optional"
+                  placeholder="Instagram ID - Optional"
                 />
               </div>
 
               <div class="profile-field">
-                <label for="x">X (Twitter):</label>
+                <label for="x">https://www.x.com/</label>
                 <input
                   type="text"
                   v-model="userStore.x"
                   id="x"
                   name="x"
-                  placeholder="X account link - Optional"
+                  placeholder="X ID - Optional"
                 />
               </div>
 
