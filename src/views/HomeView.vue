@@ -6,7 +6,6 @@ import NavbarView from './NavbarView.vue'
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
 
-// Reactive data
 const token = computed(() => userStore.token)
 const readers = ref([])
 const loading = ref(true)
@@ -15,62 +14,32 @@ const searchQuery = ref('')
 const selectedRoleFilter = ref('all')
 const selectedServiceFilter = ref('all')
 
-
-// Computed properties
-const filteredReaders = computed(() => {
-  return readers.value.filter((reader) => {
-    const matchesSearch =
-      searchQuery.value === '' ||
-      reader.username?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      reader.first_name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      reader.last_name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      reader.bio?.toLowerCase().includes(searchQuery.value.toLowerCase())
-
-    const roleNames = Array.isArray(reader.roles)
-      ? reader.roles.map((r) => (typeof r === 'string' ? r : r.role))
-      : []
-
-    const matchesRole =
-      selectedRoleFilter.value === 'all' ||
-      roleNames.includes(selectedRoleFilter.value)
-
-    const matchesService =
-      selectedServiceFilter.value === 'all' ||
-      (selectedServiceFilter.value === 'free' && !reader.charges_for_services) ||
-      (selectedServiceFilter.value === 'paid' && reader.charges_for_services)
-
-    return matchesSearch && matchesRole && matchesService
-  })
-})
-
-// Methods
 const fetchReaders = async () => {
   try {
     loading.value = true
     error.value = null
 
-    if (!userStore.token) {
+    if (!token.value) {
       error.value = 'Please log in to view readers'
       return
     }
 
     const response = await fetch(`${API_BASE_URL}/readers`, {
-      method: 'GET',
       headers: {
-        Authorization: `Bearer ${userStore.token}`,
+        Authorization: `Bearer ${token.value}`,
       },
     })
 
     if (!response.ok) {
-      const errorData = await response.text()
-      throw new Error(`HTTP ${response.status}: ${errorData}`)
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
     }
 
     const data = await response.json()
     readers.value = data.readers || []
   } catch (err) {
     error.value = err.message
-    console.error('Error fetching readers:', err)
+    console.error('Fetch error:', err)
   } finally {
     loading.value = false
   }
@@ -84,14 +53,13 @@ const getReaderRoles = (roles) => {
   }
 
   return roles
-    .filter((role) => ['arcreader', 'betareader', 'proofreader'].includes(role))
+    .filter((role) => Object.keys(roleLabels).includes(role))
     .map((role) => roleLabels[role])
     .join(', ')
 }
 
 const getProfileImageUrl = (reader) => {
   if (reader.profile_photo) {
-    // If it's a full URL, use as-is; otherwise, prepend base URL
     return reader.profile_photo.startsWith('http')
       ? reader.profile_photo
       : `${API_BASE_URL}${reader.profile_photo}`
@@ -109,16 +77,13 @@ const handleImageError = (event) => {
 
 const formatSocialLink = (platform, handle) => {
   if (!handle) return null
-
-  const baseUrls = {
+  const cleanHandle = handle.replace('@', '').trim()
+  const urls = {
     facebook: 'https://facebook.com/',
     instagram: 'https://instagram.com/',
     x: 'https://x.com/',
   }
-
-  // Remove @ if present and clean the handle
-  const cleanHandle = handle.replace('@', '').trim()
-  return baseUrls[platform] + cleanHandle
+  return urls[platform] + cleanHandle
 }
 
 const clearFilters = () => {
@@ -127,18 +92,44 @@ const clearFilters = () => {
   selectedServiceFilter.value = 'all'
 }
 
-// Lifecycle
+const filteredReaders = computed(() => {
+  return readers.value.filter((reader) => {
+    const matchesSearch =
+      !searchQuery.value ||
+      reader.username?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      reader.first_name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      reader.last_name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      reader.bio?.toLowerCase().includes(searchQuery.value.toLowerCase())
+
+    const roleNames = Array.isArray(reader.roles)
+      ? reader.roles.map((r) => (typeof r === 'string' ? r : r.role))
+      : []
+
+    const matchesRole =
+      selectedRoleFilter.value === 'all' ||
+      roleNames.includes(selectedRoleFilter.value.toLowerCase())
+
+    const matchesService =
+      selectedServiceFilter.value === 'all' ||
+      (selectedServiceFilter.value === 'free' && !reader.charges_for_services) ||
+      (selectedServiceFilter.value === 'paid' && reader.charges_for_services)
+
+    return matchesSearch && matchesRole && matchesService
+  })
+})
+
 onMounted(() => {
-  if (userStore.token) fetchReaders()
+  if (token.value) fetchReaders()
 })
 
 onUnmounted(() => {
-  console.log('HomeView unmounted')
+  console.log('Component unmounted')
 })
 </script>
 
 <template>
   <main class="reader-directory">
+    <!-- Header -->
     <div class="header-section">
       <NavbarView />
       <hr />
@@ -164,9 +155,9 @@ onUnmounted(() => {
           <label for="role-filter">Reader Type:</label>
           <select v-model="selectedRoleFilter" id="role-filter" class="filter-select">
             <option value="all">All Types</option>
-            <option value="Arc Reader">ARC Readers</option>
-            <option value="Beta Reader">Beta Readers</option>
-            <option value="Proof Reader">Proofreaders</option>
+            <option value="arcreader">ARC Readers</option>
+            <option value="betareader">Beta Readers</option>
+            <option value="proofreader">Proofreaders</option>
           </select>
         </div>
 
@@ -207,76 +198,63 @@ onUnmounted(() => {
           <img
             :src="getProfileImageUrl(reader)"
             :alt="`${reader.first_name} ${reader.last_name}`"
-            @error="handleImageError($event)"
+            @error="handleImageError"
           />
         </div>
 
         <!-- Reader Info -->
         <div class="reader-info">
-          <div class="reader-header">
-            <h3 class="reader-name">{{ reader.first_name }} {{ reader.last_name }}</h3>
-            <p class="reader-username">@{{ reader.username }}</p>
-            <div class="reader-roles">
-              {{ getReaderRoles(reader.roles) }}
-            </div>
-            <div class="service-type" :class="{ 'paid-service': reader.charges_for_services }">
-              {{ reader.charges_for_services ? 'Paid Services' : 'Free Services' }}
-            </div>
-          </div>
+          <h3 class="reader-name">{{ reader.first_name }} {{ reader.last_name }}</h3>
+          <p class="reader-username">@{{ reader.username }}</p>
+          <p class="reader-roles">{{ getReaderRoles(reader.roles) }}</p>
+          <p class="service-type" :class="{ 'paid-service': reader.charges_for_services }">
+            {{ reader.charges_for_services ? 'Paid Services' : 'Free Services' }}
+          </p>
 
           <!-- Contact Info -->
-          <div class="contact-info">
-            <p class="email">
-              <strong>Email:</strong>
-              <a :href="`mailto:${reader.email}`">{{ reader.email }}</a>
-            </p>
-          </div>
+          <p class="email">
+            <strong>Email:</strong>
+            <a :href="`mailto:${reader.email}`">{{ reader.email }}</a>
+          </p>
 
           <!-- Bio -->
-          <div v-if="reader.bio" class="reader-bio">
-            <p>{{ reader.bio }}</p>
-          </div>
+          <p v-if="reader.bio" class="reader-bio">{{ reader.bio }}</p>
 
           <!-- Social Links -->
-          <div
-            class="social-links"
-            v-if="reader.facebook_handle || reader.instagram_handle || reader.x_handle"
-          >
-            <h4>Connect:</h4>
-            <div class="social-buttons">
-              <a
-                v-if="reader.facebook_handle"
-                :href="formatSocialLink('facebook', reader.facebook_handle)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-link facebook"
-              >
-                <span class="social-icon">📘</span>
-                Facebook
-              </a>
-
-              <a
-                v-if="reader.instagram_handle"
-                :href="formatSocialLink('instagram', reader.instagram_handle)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-link instagram"
-              >
-                <span class="social-icon">📷</span>
-                Instagram
-              </a>
-
-              <a
-                v-if="reader.x_handle"
-                :href="formatSocialLink('x', reader.x_handle)"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-link x"
-              >
-                <span class="social-icon">𝕏</span>
-                X (Twitter)
-              </a>
-            </div>
+          <div class="social-links" v-if="reader.facebook || reader.instagram || reader.x">
+            <h4>Social Media</h4>
+            <ul class="social-list">
+              <li v-if="reader.facebook">
+                <strong>Facebook:</strong>
+                <a
+                  :href="formatSocialLink('facebook', reader.facebook)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ formatSocialLink('facebook', reader.facebook) }}
+                </a>
+              </li>
+              <li v-if="reader.instagram">
+                <strong>Instagram:</strong>
+                <a
+                  :href="formatSocialLink('instagram', reader.instagram)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ formatSocialLink('instagram', reader.instagram) }}
+                </a>
+              </li>
+              <li v-if="reader.x">
+                <strong>X:</strong>
+                <a
+                  :href="formatSocialLink('x', reader.x)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ formatSocialLink('x', reader.x) }}
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
