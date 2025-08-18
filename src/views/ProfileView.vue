@@ -186,10 +186,36 @@ onMounted(() => {
           </fieldset>
         </section>
 
+        <!-- Genres Section - Only show if user selected reader roles -->
+        <section v-if="isReaderRole" class="form-section">
+          <fieldset class="genres-fieldset">
+            <legend>Preferred Genres:</legend>
+
+            <div class="fields-container">
+              <div class="fields-grid">
+                <div class="profile-field">
+                  <label for="genres">Select your preferred genres:</label>
+                  <select id="genres" v-model="userStore.genres" multiple class="genres-select">
+                    <option value="fantasy">Biographies & Memoirs</option>
+                    <option value="science fiction">Business & Money</option>
+                    <option value="mystery">Children's Books</option>
+                    <option value="romance">History</option>
+                    <option value="horror">Teen & Young Adult</option>
+                    <option value="romance">Self-Help</option>
+                    <option value="romance">Romance</option>
+                    <option value="romance">Mystery, Thriller, & Suspense</option>
+                    <option value="romance">Science Fiction & Fantasy</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </section>
+
         <!-- Social Media Section - Only show if user selected reader roles -->
         <section v-if="isReaderRole" class="form-section">
           <fieldset class="info-fieldset">
-            <legend>Social Media Links</legend>
+            <legend>Social Media Links:</legend>
 
             <div class="fields-grid">
               <div class="profile-field">

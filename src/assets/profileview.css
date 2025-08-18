@@ -37,7 +37,8 @@
 }
 
 .info-fieldset,
-.roles-fieldset {
+.roles-fieldset,
+.genres-fieldset {
   border: 2px solid #ddd;
   border-radius: 8px;
   padding: 1.5rem;
@@ -47,7 +48,8 @@
 }
 
 .info-fieldset legend,
-.roles-fieldset legend {
+.roles-fieldset legend,
+.genres-fieldset legend {
   font-weight: 600;
   color: #555;
   padding: 0 1rem;
