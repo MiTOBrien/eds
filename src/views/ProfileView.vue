@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useUserStore } from '@/stores/useUserStore'
 import NavbarView from './NavbarView.vue'
 
@@ -7,6 +7,9 @@ const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
 const selectedRoles = ref([])
 const updateStatus = ref('') // Optional: for feedback messages
+const genres = ref([])
+const selectedGenres = ref([])
+const selectedSubGenres = reactive({})
 
 const token = computed(() => userStore.token)
 
@@ -25,6 +28,36 @@ const isReaderRole = computed(() => {
     ['arc reader', 'beta reader', 'proof reader'].includes(role),
   )
 })
+
+// Fetch genres from backend
+const fetchGenres = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/genres`, {
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
+    }
+
+    const data = await response.json()
+    genres.value = data
+  } catch (error) {
+    console.error('Error fetching genres:', error)
+  }
+}
+
+// Toggle subgenre visibility
+const toggleSubGenres = (genreId) => {
+  if (!selectedSubGenres[genreId]) {
+    selectedSubGenres[genreId] = []
+  }
+}
 
 // Submit handler
 const handleSubmit = async (event) => {
@@ -69,6 +102,7 @@ const handleSubmit = async (event) => {
 onMounted(() => {
   userStore.restoreFromLocalStorage()
   initializeRoles()
+  fetchGenres()
 })
 </script>
 
@@ -193,19 +227,28 @@ onMounted(() => {
 
             <div class="fields-container">
               <div class="fields-grid">
-                <div class="profile-field">
-                  <label for="genres">Select your preferred genres:</label>
-                  <select id="genres" v-model="userStore.genres" multiple class="genres-select">
-                    <option value="fantasy">Biographies & Memoirs</option>
-                    <option value="science fiction">Business & Money</option>
-                    <option value="mystery">Children's Books</option>
-                    <option value="romance">History</option>
-                    <option value="horror">Teen & Young Adult</option>
-                    <option value="romance">Self-Help</option>
-                    <option value="romance">Romance</option>
-                    <option value="romance">Mystery, Thriller, & Suspense</option>
-                    <option value="romance">Science Fiction & Fantasy</option>
-                  </select>
+                <div class="profile-field" v-for="genre in genres" :key="genre.id">
+                  <label>
+                    <input
+                      type="checkbox"
+                      :value="genre.name"
+                      v-model="selectedGenres"
+                      @change="toggleSubGenres(genre.id)"
+                    />
+                    {{ genre.name }}
+                  </label>
+
+                  <!-- Sub-genres -->
+                  <div v-if="selectedGenres.includes(genre.name)" class="sub-genres">
+                    <label v-for="sub in genre.subgenres" :key="sub.id" class="sub-genre-label">
+                      <input
+                        type="checkbox"
+                        :value="sub.name"
+                        v-model="selectedSubGenres[genre.id]"
+                      />
+                      {{ sub.name }}
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
