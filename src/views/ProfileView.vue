@@ -70,7 +70,7 @@ const handleSubmit = async (event) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${userStore.token}`,
       },
       body: JSON.stringify({
         user: {
@@ -78,9 +78,9 @@ const handleSubmit = async (event) => {
           first_name: userStore.first_name,
           last_name: userStore.last_name,
           roles: selectedRoles.value,
-          facebook: userStore.facebook,
-          instagram: userStore.instagram,
-          x: userStore.x,
+          facebook: userStore.facebook_handle,
+          instagram: userStore.instagram_handle,
+          x: userStore.x_handle,
           bio: userStore.bio,
         },
       }),
@@ -225,10 +225,10 @@ onMounted(() => {
           <fieldset class="genres-fieldset">
             <legend>Preferred Genres:</legend>
 
-            <div class="fields-container">
-              <div class="fields-grid">
-                <div class="profile-field" v-for="genre in genres" :key="genre.id">
-                  <label>
+            <div class="roles-container">
+              <div class="roles-grid">
+                <div class="genre-option" v-for="genre in genres" :key="genre.id">
+                  <label class="checkbox-wrapper">
                     <input
                       type="checkbox"
                       :value="genre.name"
@@ -239,8 +239,8 @@ onMounted(() => {
                   </label>
 
                   <!-- Sub-genres -->
-                  <div v-if="selectedGenres.includes(genre.name)" class="sub-genres">
-                    <label v-for="sub in genre.subgenres" :key="sub.id" class="sub-genre-label">
+                  <div v-if="selectedGenres.includes(genre.name)" class="sub-genre-row">
+                    <label v-for="sub in genre.subgenres" :key="sub.id" class="sub-genre-option">
                       <input
                         type="checkbox"
                         :value="sub.name"
@@ -265,7 +265,7 @@ onMounted(() => {
                 <label for="facebook">https://www.facebook.com/</label>
                 <input
                   type="text"
-                  v-model="userStore.facebook"
+                  v-model="userStore.facebook_handle"
                   id="facebook"
                   name="facebook"
                   placeholder="Facebook ID - Optional"
@@ -276,7 +276,7 @@ onMounted(() => {
                 <label for="instagram">https://www.instagram.com/</label>
                 <input
                   type="text"
-                  v-model="userStore.instagram"
+                  v-model="userStore.instagram_handle"
                   id="instagram"
                   name="instagram"
                   placeholder="Instagram ID - Optional"
@@ -287,7 +287,7 @@ onMounted(() => {
                 <label for="x">https://www.x.com/</label>
                 <input
                   type="text"
-                  v-model="userStore.x"
+                  v-model="userStore.x_handle"
                   id="x"
                   name="x"
                   placeholder="X ID - Optional"
