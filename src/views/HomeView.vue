@@ -135,8 +135,6 @@ onUnmounted(() => {
       <hr />
       <h3>Find Your Perfect Reader</h3>
       <p class="subtitle">Connect with experienced ARC readers, beta readers, and proofreaders</p>
-      <p v-if="token">Token: {{ token }}</p>
-      <p v-else>No token found</p>
     </div>
 
     <!-- Search and Filter Section -->
@@ -205,7 +203,7 @@ onUnmounted(() => {
         <!-- Reader Info -->
         <div class="reader-info">
           <h3 class="reader-name">{{ reader.first_name }} {{ reader.last_name }}</h3>
-          <p class="reader-username">@{{ reader.username }}</p>
+          <p class="reader-username"><strong>Username:</strong> {{ reader.username }}</p>
           <p class="reader-roles">{{ getReaderRoles(reader.roles) }}</p>
           <p class="service-type" :class="{ 'paid-service': reader.charges_for_services }">
             {{ reader.charges_for_services ? 'Paid Services' : 'Free Services' }}
@@ -213,11 +211,12 @@ onUnmounted(() => {
 
           <!-- Contact Info -->
           <p class="email">
-            <strong>Email:</strong>
+            <strong>Contact Email:</strong>
             <a :href="`mailto:${reader.email}`">{{ reader.email }}</a>
           </p>
 
           <!-- Bio -->
+          <p>Bio:</p>
           <p v-if="reader.bio" class="reader-bio">{{ reader.bio }}</p>
 
           <!-- Social Links -->

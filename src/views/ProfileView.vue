@@ -115,9 +115,6 @@ onMounted(() => {
     <div class="content-wrapper">
       <header class="profile-header">
         <h3>User Profile</h3>
-        <p class="subtitle">Manage your account information and preferences</p>
-        <p v-if="token">Token: {{ token }}</p>
-        <p v-else>No token found</p>
       </header>
 
       <form class="profile-form" @submit="handleSubmit">
