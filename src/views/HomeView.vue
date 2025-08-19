@@ -57,7 +57,7 @@ const getProfileImageUrl = (reader) => {
       ? reader.profile_picture
       : `${API_BASE_URL}${reader.profile_picture}`
   }
-  return '/default-avatar.png'
+  return 'public/icons8-user-default-64.png'
 }
 
 const handleImageError = (event) => {
@@ -199,12 +199,12 @@ onMounted(() => {
 
           <!-- Contact Info -->
           <p class="email">
-            <strong>Contact Email:</strong>
+            <strong>Contact Email: </strong>
             <a :href="`mailto:${reader.email}`">{{ reader.email }}</a>
           </p>
 
           <!-- Bio -->
-          <p>Bio:</p>
+          <p><strong>About:</strong></p>
           <p v-if="reader.bio" class="reader-bio">{{ reader.bio }}</p>
 
           <!-- Social Links -->
