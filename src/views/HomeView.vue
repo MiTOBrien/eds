@@ -51,18 +51,20 @@ const getReaderRoles = (roles) => {
     betareader: 'Beta Reader',
     proofreader: 'Proofreader',
   }
-
+  
+  console.log('roles:', roles)
+  console.log('roleLabels:', roleLabels)
   return roles
-    .filter((role) => Object.keys(roleLabels).includes(role))
-    .map((role) => roleLabels[role])
-    .join(', ')
+    // .filter((role) => Object.keys(roleLabels).includes(role))
+    // .map((role) => roleLabels[role])
+    // .join(', ')
 }
 
 const getProfileImageUrl = (reader) => {
-  if (reader.profile_photo) {
-    return reader.profile_photo.startsWith('http')
-      ? reader.profile_photo
-      : `${API_BASE_URL}${reader.profile_photo}`
+  if (reader.profile_picture) {
+    return reader.profile_picture.startsWith('http')
+      ? reader.profile_picture
+      : `${API_BASE_URL}${reader.profile_picture}`
   }
   return '/default-avatar.png'
 }
@@ -120,10 +122,6 @@ const filteredReaders = computed(() => {
 
 onMounted(() => {
   if (token.value) fetchReaders()
-})
-
-onUnmounted(() => {
-  console.log('Component unmounted')
 })
 </script>
 
