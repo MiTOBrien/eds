@@ -46,18 +46,9 @@ const fetchReaders = async () => {
 }
 
 const getReaderRoles = (roles) => {
-  const roleLabels = {
-    arcreader: 'ARC Reader',
-    betareader: 'Beta Reader',
-    proofreader: 'Proofreader',
-  }
-  
-  console.log('roles:', roles)
-  console.log('roleLabels:', roleLabels)
-  return roles
-    // .filter((role) => Object.keys(roleLabels).includes(role))
-    // .map((role) => roleLabels[role])
-    // .join(', ')
+  if (!Array.isArray(roles)) return ''
+
+  return roles.map((role) => (typeof role === 'string' ? role : role.role)).join(', ')
 }
 
 const getProfileImageUrl = (reader) => {
@@ -108,8 +99,7 @@ const filteredReaders = computed(() => {
       : []
 
     const matchesRole =
-      selectedRoleFilter.value === 'all' ||
-      roleNames.includes(selectedRoleFilter.value.toLowerCase())
+      selectedRoleFilter.value === 'all' || roleNames.includes(selectedRoleFilter.value)
 
     const matchesService =
       selectedServiceFilter.value === 'all' ||
@@ -151,9 +141,9 @@ onMounted(() => {
           <label for="role-filter">Reader Type:</label>
           <select v-model="selectedRoleFilter" id="role-filter" class="filter-select">
             <option value="all">All Types</option>
-            <option value="arcreader">ARC Readers</option>
-            <option value="betareader">Beta Readers</option>
-            <option value="proofreader">Proofreaders</option>
+            <option value="Arc Reader">ARC Readers</option>
+            <option value="Beta Reader">Beta Readers</option>
+            <option value="Proof Reader">Proof Readers</option>
           </select>
         </div>
 
