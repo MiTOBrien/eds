@@ -17,7 +17,7 @@ const token = computed(() => userStore.token)
 const initializeRoles = () => {
   if (userStore.roles && Array.isArray(userStore.roles)) {
     selectedRoles.value = userStore.roles.map((roleObj) =>
-      typeof roleObj === 'object' ? roleObj.role.toLowerCase() : roleObj.toLowerCase(),
+      typeof roleObj === 'object' ? roleObj.id : roleObj,
     )
   }
 }
@@ -64,8 +64,11 @@ const handleSubmit = async (event) => {
   event.preventDefault()
 
   try {
-    const token = localStorage.getItem('jwt') // Adjust if stored differently
-    console.log('JWT:', token)
+    // const token = localStorage.getItem('jwt')
+    const allGenreSelections = Array.from(
+      new Set([...selectedGenres.value, ...Object.values(selectedSubGenres).flat()]),
+    )
+
     const response = await fetch(`${API_BASE_URL}/users/${userStore.id}`, {
       method: 'PUT',
       headers: {
@@ -77,11 +80,12 @@ const handleSubmit = async (event) => {
           username: userStore.username,
           first_name: userStore.first_name,
           last_name: userStore.last_name,
-          roles: selectedRoles.value,
+          role_ids: selectedRoles.value,
           facebook: userStore.facebook_handle,
           instagram: userStore.instagram_handle,
           x: userStore.x_handle,
           bio: userStore.bio,
+          genre_ids: allGenreSelections,
         },
       }),
     })
@@ -179,7 +183,7 @@ onMounted(() => {
             <div class="roles-container">
               <div class="roles-grid">
                 <div class="role-option">
-                  <input type="checkbox" id="author" value="author" v-model="selectedRoles" />
+                  <input type="checkbox" id="author" value="2" v-model="selectedRoles" />
                   <label for="author">Author</label>
                 </div>
 
@@ -187,7 +191,7 @@ onMounted(() => {
                   <input
                     type="checkbox"
                     id="arcreader"
-                    value="arc reader"
+                    value="3"
                     v-model="selectedRoles"
                   />
                   <label for="arcreader">ARC Reader</label>
@@ -197,7 +201,7 @@ onMounted(() => {
                   <input
                     type="checkbox"
                     id="betareader"
-                    value="beta reader"
+                    value="4"
                     v-model="selectedRoles"
                   />
                   <label for="betareader">Beta Reader</label>
@@ -207,7 +211,7 @@ onMounted(() => {
                   <input
                     type="checkbox"
                     id="proofreader"
-                    value="proof reader"
+                    value="5"
                     v-model="selectedRoles"
                   />
                   <label for="proofreader">Proof Reader</label>
@@ -228,7 +232,7 @@ onMounted(() => {
                   <label class="checkbox-wrapper">
                     <input
                       type="checkbox"
-                      :value="genre.name"
+                      :value="genre.id"
                       v-model="selectedGenres"
                       @change="toggleSubGenres(genre.id)"
                     />
@@ -236,11 +240,11 @@ onMounted(() => {
                   </label>
 
                   <!-- Sub-genres -->
-                  <div v-if="selectedGenres.includes(genre.name)" class="sub-genre-row">
+                  <div v-if="selectedGenres.includes(genre.id)" class="sub-genre-row">
                     <label v-for="sub in genre.subgenres" :key="sub.id" class="sub-genre-option">
                       <input
                         type="checkbox"
-                        :value="sub.name"
+                        :value="sub.id"
                         v-model="selectedSubGenres[genre.id]"
                       />
                       {{ sub.name }}
