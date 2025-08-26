@@ -22,11 +22,11 @@ const initializeRoles = () => {
   }
 }
 
-// Computed property to check if user selected any reader roles
+// Check if user selected any reader roles
+const READER_ROLE_IDS = [3, 4, 5]
+
 const isReaderRole = computed(() => {
-  return selectedRoles.value.some((role) =>
-    ['arc reader', 'beta reader', 'proof reader'].includes(role),
-  )
+  return selectedRoles.value.some((roleId) => READER_ROLE_IDS.includes(Number(roleId)))
 })
 
 // Fetch genres from backend
@@ -188,32 +188,17 @@ onMounted(() => {
                 </div>
 
                 <div class="role-option">
-                  <input
-                    type="checkbox"
-                    id="arcreader"
-                    value="3"
-                    v-model="selectedRoles"
-                  />
+                  <input type="checkbox" id="arcreader" value="3" v-model="selectedRoles" />
                   <label for="arcreader">ARC Reader</label>
                 </div>
 
                 <div class="role-option">
-                  <input
-                    type="checkbox"
-                    id="betareader"
-                    value="4"
-                    v-model="selectedRoles"
-                  />
+                  <input type="checkbox" id="betareader" value="4" v-model="selectedRoles" />
                   <label for="betareader">Beta Reader</label>
                 </div>
 
                 <div class="role-option">
-                  <input
-                    type="checkbox"
-                    id="proofreader"
-                    value="5"
-                    v-model="selectedRoles"
-                  />
+                  <input type="checkbox" id="proofreader" value="5" v-model="selectedRoles" />
                   <label for="proofreader">Proof Reader</label>
                 </div>
               </div>

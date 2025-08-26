@@ -31,10 +31,18 @@ export const useUserStore = defineStore('user', {
       this.facebook_handle = userData.facebook || ''
       this.instagram_handle = userData.instagram || ''
       this.x_handle = userData.x || ''
-      this.roles = userData.roles || []
+      this.roles = Array.isArray(userData.roles)
+        ? userData.roles.map((role) => (typeof role === 'object' ? role.id : role))
+        : []
       this.isLoggedIn = true
 
-      localStorage.setItem('user', JSON.stringify(userData))
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          ...userData,
+          roles: this.roles, // Store normalized role IDs
+        }),
+      )
     },
 
     setUser(userData) {
@@ -76,7 +84,9 @@ export const useUserStore = defineStore('user', {
         this.facebook_handle = userData.facebook || ''
         this.instagram_handle = userData.instagram || ''
         this.x_handle = userData.x || ''
-        this.roles = userData.roles || []
+        this.roles = Array.isArray(userData.roles)
+          ? userData.roles.map((role) => (typeof role === 'object' ? role.id : role))
+          : []
         this.isLoggedIn = true
       }
     },

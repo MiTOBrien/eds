@@ -14,6 +14,19 @@ const searchQuery = ref('')
 const selectedRoleFilter = ref('all')
 const selectedServiceFilter = ref('all')
 
+const roleNameToId = {
+  'Arc Reader': 3,
+  'Beta Reader': 4,
+  'Proof Reader': 5,
+}
+
+const roleIdToName = {
+  2: 'Author',
+  3: 'Arc Reader',
+  4: 'Beta Reader',
+  5: 'Proof Reader',
+}
+
 const fetchReaders = async () => {
   try {
     loading.value = true
@@ -39,7 +52,6 @@ const fetchReaders = async () => {
     readers.value = data.readers || []
   } catch (err) {
     error.value = err.message
-    console.error('Fetch error:', err)
   } finally {
     loading.value = false
   }
@@ -47,8 +59,7 @@ const fetchReaders = async () => {
 
 const getReaderRoles = (roles) => {
   if (!Array.isArray(roles)) return ''
-
-  return roles.map((role) => (typeof role === 'string' ? role : role.role)).join(', ')
+  return roles.map((r) => r.name || `Role ${r.id}`).join(', ')
 }
 
 const getProfileImageUrl = (reader) => {
@@ -99,7 +110,9 @@ const filteredReaders = computed(() => {
       : []
 
     const matchesRole =
-      selectedRoleFilter.value === 'all' || roleNames.includes(selectedRoleFilter.value)
+      selectedRoleFilter.value === 'all' ||
+      (Array.isArray(reader.roles) &&
+        reader.roles.some((r) => r.id === roleNameToId[selectedRoleFilter.value]))
 
     const matchesService =
       selectedServiceFilter.value === 'all' ||
