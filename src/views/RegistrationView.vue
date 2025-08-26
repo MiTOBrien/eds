@@ -10,17 +10,17 @@ const first_name = ref('')
 const last_name = ref('')
 const password = ref('')
 const confirmPassword = ref('')
-const selectedRoles = ref([])
+const selectedRoles = ref([]) // should now contain role_ids like [2, 3, 4]
 const chargesForServices = ref(false)
 const subscriptionPlan = ref('monthly') // 'monthly' or 'annual'
-const freePlanAcknowledgment = ref(false) // New reactive ref for acknowledgment
+const freePlanAcknowledgment = ref(false)
 const router = useRouter()
 const userStore = useUserStore()
 
 // Computed property to determine if user needs paid subscription
 const needsPaidSubscription = computed(() => {
-  const paidRoles = ['arcreader', 'betareader', 'proofreader']
-  const hasPaidRole = selectedRoles.value.some((role) => paidRoles.includes(role))
+  const paidRoleIds = [3, 4, 5] // arc reader, beta reader, proofreader
+  const hasPaidRole = selectedRoles.value.some((id) => paidRoleIds.includes(id))
   return hasPaidRole && chargesForServices.value
 })
 
@@ -39,7 +39,6 @@ const subscriptionPrice = computed(() => {
 })
 
 const register = async () => {
-  // Check if passwords match
   if (password.value !== confirmPassword.value) {
     alert('Passwords do not match')
     return
@@ -50,7 +49,6 @@ const register = async () => {
     return
   }
 
-  // Check free plan acknowledgment when applicable
   if (!needsPaidSubscription.value && !freePlanAcknowledgment.value) {
     alert('Please acknowledge the free plan terms')
     return
@@ -67,7 +65,7 @@ const register = async () => {
           first_name: first_name.value,
           last_name: last_name.value,
           password: password.value,
-          roles: selectedRoles.value,
+          role_ids: selectedRoles.value,
           subscription_type: subscriptionType.value,
           charges_for_services: chargesForServices.value,
         },
@@ -172,17 +170,17 @@ const register = async () => {
             <legend>Register as:</legend>
             <div class="roles-grid">
               <div class="role-option">
-                <input type="checkbox" id="author" value="author" v-model="selectedRoles" />
+                <input type="checkbox" id="author" value="2" v-model="selectedRoles" />
                 <label for="author">Author</label>
               </div>
 
               <div class="role-option">
-                <input type="checkbox" id="arcreader" value="arcreader" v-model="selectedRoles" />
+                <input type="checkbox" id="arcreader" value="3" v-model="selectedRoles" />
                 <label for="arcreader">ARC Reader</label>
               </div>
 
               <div class="role-option">
-                <input type="checkbox" id="betareader" value="betareader" v-model="selectedRoles" />
+                <input type="checkbox" id="betareader" value="4" v-model="selectedRoles" />
                 <label for="betareader">Beta Reader</label>
               </div>
 
@@ -190,7 +188,7 @@ const register = async () => {
                 <input
                   type="checkbox"
                   id="proofreader"
-                  value="proofreader"
+                  value="5"
                   v-model="selectedRoles"
                 />
                 <label for="proofreader">Proof Reader</label>
@@ -202,9 +200,7 @@ const register = async () => {
         <!-- Service Pricing Question -->
         <div
           class="form-group"
-          v-if="
-            selectedRoles.some((role) => ['arcreader', 'betareader', 'proofreader'].includes(role))
-          "
+          v-if="needsPaidSubscription || selectedRoles.some(role => [3, 4, 5].includes(Number(role)))"
         >
           <fieldset class="service-pricing-fieldset">
             <legend>Do you charge authors for your services?</legend>
