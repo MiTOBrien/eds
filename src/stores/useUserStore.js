@@ -1,94 +1,126 @@
 import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 
-export const useUserStore = defineStore('user', {
-  state: () => ({
-    token: null,
-    id: null,
-    username: '',
-    email: '',
-    first_name: '',
-    last_name: '',
-    professional: false,
-    bio: '',
-    profile_picture: '',
-    facebook_handle: '',
-    instagram_handle: '',
-    x_handle: '',
-    isLoggedIn: false,
-    roles: [],
-  }),
-  actions: {
-    login(userData) {
-      this.token = userData.token
-      this.id = userData.id
-      this.username = userData.username
-      this.email = userData.email
-      this.first_name = userData.first_name
-      this.last_name = userData.last_name
-      this.professional = userData.professional || false
-      this.bio = userData.bio || ''
-      this.profile_picture = userData.profile_picture || ''
-      this.facebook_handle = userData.facebook || ''
-      this.instagram_handle = userData.instagram || ''
-      this.x_handle = userData.x || ''
-      this.roles = Array.isArray(userData.roles)
-        ? userData.roles.map((role) => (typeof role === 'object' ? role.id : role))
-        : []
-      this.isLoggedIn = true
+export const useUserStore = defineStore('user', () => {
+  // State
+  const token = ref(null)
+  const id = ref(null)
+  const username = ref('')
+  const email = ref('')
+  const first_name = ref('')
+  const last_name = ref('')
+  const professional = ref(false)
+  const bio = ref('')
+  const profile_picture = ref('')
+  const facebook_handle = ref('')
+  const instagram_handle = ref('')
+  const x_handle = ref('')
+  const roles = ref([])
+  const genres = ref([])
+  const isLoggedIn = ref(false)
+  const shouldRefreshReaders = ref(false)
 
-      localStorage.setItem(
-        'user',
-        JSON.stringify({
-          ...userData,
-          roles: this.roles, // Store normalized role IDs
-        }),
-      )
-    },
+  // Actions
+  function login(userData) {
+    token.value = userData.token
+    id.value = userData.id
+    username.value = userData.username
+    email.value = userData.email
+    first_name.value = userData.first_name
+    last_name.value = userData.last_name
+    professional.value = userData.professional || false
+    bio.value = userData.bio || ''
+    profile_picture.value = userData.profile_picture || ''
+    facebook_handle.value = userData.facebook || ''
+    instagram_handle.value = userData.instagram || ''
+    x_handle.value = userData.x || ''
+    roles.value = Array.isArray(userData.roles)
+      ? userData.roles.map((role) => (typeof role === 'object' ? role.id : role))
+      : []
+    genres.value = Array.isArray(userData.genres)
+      ? userData.genres.map((genre) => (typeof genre === 'object' ? genre.id : genre))
+      : []
+    isLoggedIn.value = true
 
-    setUser(userData) {
-      this.login(userData)
-    },
+    localStorage.setItem(
+      'user',
+      JSON.stringify({
+        ...userData,
+        roles: roles.value,
+      }),
+    )
+  }
 
-    logout() {
-      this.token = null
-      this.id = null
-      this.username = ''
-      this.email = ''
-      this.first_name = ''
-      this.last_name = ''
-      this.professional = false
-      this.bio = ''
-      this.profile_picture = ''
-      this.facebook_handle = ''
-      this.instagram_handle = ''
-      this.x_handle = ''
-      this.roles = []
-      this.isLoggedIn = false
+  function setUser(userData) {
+    const currentToken = token.value
+    login({
+      ...userData,
+      token: userData.token || currentToken,
+    })
+    shouldRefreshReaders.value = true
+  }
 
-      localStorage.removeItem('user')
-    },
+  function logout() {
+    token.value = null
+    id.value = null
+    username.value = ''
+    email.value = ''
+    first_name.value = ''
+    last_name.value = ''
+    professional.value = false
+    bio.value = ''
+    profile_picture.value = ''
+    facebook_handle.value = ''
+    instagram_handle.value = ''
+    x_handle.value = ''
+    roles.value = []
+    genres.value = []
+    isLoggedIn.value = false
 
-    restoreFromLocalStorage() {
-      const stored = localStorage.getItem('user')
-      if (stored) {
-        const userData = JSON.parse(stored)
-        this.token = userData.token
-        this.id = userData.id
-        this.username = userData.username
-        this.email = userData.email
-        this.first_name = userData.first_name
-        this.last_name = userData.last_name
-        this.professional = userData.professional || false
-        this.bio = userData.bio || ''
-        this.profile_picture = userData.profile_picture || ''
-        this.facebook_handle = userData.facebook || ''
-        this.instagram_handle = userData.instagram || ''
-        this.x_handle = userData.x || ''
-        this.roles = Array.isArray(userData.roles)
-          ? userData.roles.map((role) => (typeof role === 'object' ? role.id : role))
-          : []
-        this.isLoggedIn = true
+    localStorage.removeItem('user')
+  }
+
+  function restoreFromLocalStorage() {
+    const stored = localStorage.getItem('user')
+    if (stored) {
+      const userData = JSON.parse(stored)
+
+      if (userData.token) {
+        token.value = userData.token
       }
-    },
-  },
+
+      login(userData)
+    }
+  }
+
+  function resetRefreshFlag() {
+    shouldRefreshReaders.value = false
+  }
+
+  return {
+    // State
+    token,
+    id,
+    username,
+    email,
+    first_name,
+    last_name,
+    professional,
+    bio,
+    profile_picture,
+    facebook_handle,
+    instagram_handle,
+    x_handle,
+    roles,
+    genres,
+    isLoggedIn,
+    shouldRefreshReaders,
+
+    // Actions
+    login,
+    setUser,
+    logout,
+    restoreFromLocalStorage,
+    resetRefreshFlag,
+  }
 })

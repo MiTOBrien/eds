@@ -95,7 +95,8 @@ const handleSubmit = async (event) => {
     }
 
     const updatedUser = await response.json()
-    userStore.setUser(updatedUser) // Assuming you have a method to update store
+    userStore.setUser(updatedUser)
+
     updateStatus.value = 'Profile updated successfully!'
   } catch (error) {
     console.error(error)

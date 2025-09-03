@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, watchEffect } from 'vue'
 import { useUserStore } from '@/stores/useUserStore'
 import NavbarView from './NavbarView.vue'
 
@@ -28,6 +28,9 @@ const roleIdToName = {
 }
 
 const fetchReaders = async () => {
+  console.log("isLoggedIn:", userStore.isLoggedIn)
+  console.log("Auth token:", userStore.token)
+  console.log('Fetching readers...')
   try {
     loading.value = true
     error.value = null
@@ -49,11 +52,14 @@ const fetchReaders = async () => {
     }
 
     const data = await response.json()
+    console.log('Fetched data:', data)
     readers.value = data.readers || []
   } catch (err) {
+    console.log('Error fetching readers:', err)
     error.value = err.message
   } finally {
     loading.value = false
+    console.log('Loading set to false.')
   }
 }
 
@@ -126,6 +132,14 @@ const filteredReaders = computed(() => {
 onMounted(() => {
   if (token.value) fetchReaders()
 })
+
+watchEffect(() => {
+  if (userStore.shouldRefreshReaders.value) {
+    console.log('Watcher triggered:', userStore.shouldRefreshReaders.value)
+    fetchReaders()
+    userStore.resetRefreshFlag()
+  }
+})
 </script>
 
 <template>
@@ -179,7 +193,7 @@ onMounted(() => {
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading.value" class="loading-state">
       <p>Loading readers...</p>
     </div>
 
@@ -264,6 +278,9 @@ onMounted(() => {
     <div v-else class="no-results">
       <p>No readers found matching your criteria.</p>
       <button @click="clearFilters" class="clear-filters-btn">Clear Filters</button>
+    </div>
+    <div>
+      <button @click="fetchReaders">Test Fetch</button>
     </div>
   </main>
 </template>
