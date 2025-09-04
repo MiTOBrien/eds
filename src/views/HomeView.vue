@@ -28,8 +28,8 @@ const roleIdToName = {
 }
 
 const fetchReaders = async () => {
-  console.log("isLoggedIn:", userStore.isLoggedIn)
-  console.log("Auth token:", userStore.token)
+  console.log('isLoggedIn:', userStore.isLoggedIn)
+  console.log('Auth token:', userStore.token)
   console.log('Fetching readers...')
   try {
     loading.value = true
@@ -229,6 +229,19 @@ watchEffect(() => {
             <strong>Contact Email: </strong>
             <a :href="`mailto:${reader.email}`">{{ reader.email }}</a>
           </p>
+
+          <!-- Genre & Subgenre Display -->
+          <div v-if="reader.genres && reader.genres.length" class="genre-display">
+            <strong>Preferred Genres:</strong>
+            <div class="genre-tags">
+              <span v-for="genre in reader.genres" :key="genre.id" class="genre-tag">
+                {{ genre.name }}
+                <span v-for="sub in genre.subgenres" :key="sub.id" class="subgenre-tag">
+                  • {{ sub.name }}
+                </span>
+              </span>
+            </div>
+          </div>
 
           <!-- Bio -->
           <p><strong>About:</strong></p>
@@ -498,6 +511,42 @@ watchEffect(() => {
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #eee;
+}
+
+.genre-display {
+  margin: 1rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.genre-display strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.genre-tag {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  color: #007bff;
+  font-weight: 600;
+}
+
+.subgenre-tag {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  color: #555;
+  font-weight: 500;
 }
 
 .reader-bio p {
