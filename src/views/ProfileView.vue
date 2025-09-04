@@ -5,31 +5,44 @@ import NavbarView from './NavbarView.vue'
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
+
+const availableGenres = ref([]) // All genres from backend
+const selectedGenres = ref([]) // Genre IDs selected by user
+const selectedSubGenres = reactive({}) // Subgenre IDs grouped by genre
 const selectedRoles = ref([])
-const updateStatus = ref('') // Optional: for feedback messages
-const genres = ref([])
-const selectedGenres = ref([])
-const selectedSubGenres = reactive({})
+const updateStatus = ref('')
 
 const token = computed(() => userStore.token)
 
-// Initialize selectedRoles with user's existing roles
+const READER_ROLE_IDS = [3, 4, 5]
+
+const isReaderRole = computed(() =>
+  selectedRoles.value.some((roleId) => READER_ROLE_IDS.includes(Number(roleId))),
+)
+
+// Initialize roles from store
 const initializeRoles = () => {
-  if (userStore.roles && Array.isArray(userStore.roles)) {
+  if (Array.isArray(userStore.roles)) {
     selectedRoles.value = userStore.roles.map((roleObj) =>
       typeof roleObj === 'object' ? roleObj.id : roleObj,
     )
   }
 }
 
-// Check if user selected any reader roles
-const READER_ROLE_IDS = [3, 4, 5]
+// Initialize genre and subgenre selections from store
+const initializeGenreSelections = () => {
+  if (Array.isArray(userStore.userGenres)) {
+    selectedGenres.value = userStore.userGenres.map((genre) => genre.id)
 
-const isReaderRole = computed(() => {
-  return selectedRoles.value.some((roleId) => READER_ROLE_IDS.includes(Number(roleId)))
-})
+    userStore.userGenres.forEach((genre) => {
+      if (Array.isArray(genre.subgenres) && genre.subgenres.length > 0) {
+        selectedSubGenres[genre.id] = genre.subgenres.map((sub) => sub.id)
+      }
+    })
+  }
+}
 
-// Fetch genres from backend
+// Fetch all genres from backend
 const fetchGenres = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/genres`, {
@@ -46,7 +59,7 @@ const fetchGenres = async () => {
     }
 
     const data = await response.json()
-    genres.value = data
+    availableGenres.value = data
   } catch (error) {
     console.error('Error fetching genres:', error)
   }
@@ -59,12 +72,11 @@ const toggleSubGenres = (genreId) => {
   }
 }
 
-// Submit handler
+// Submit profile update
 const handleSubmit = async (event) => {
   event.preventDefault()
 
   try {
-    // const token = localStorage.getItem('jwt')
     const allGenreSelections = Array.from(
       new Set([...selectedGenres.value, ...Object.values(selectedSubGenres).flat()]),
     )
@@ -96,7 +108,6 @@ const handleSubmit = async (event) => {
 
     const updatedUser = await response.json()
     userStore.setUser(updatedUser)
-
     updateStatus.value = 'Profile updated successfully!'
   } catch (error) {
     console.error(error)
@@ -104,10 +115,12 @@ const handleSubmit = async (event) => {
   }
 }
 
-onMounted(() => {
+// Lifecycle
+onMounted(async () => {
   userStore.restoreFromLocalStorage()
   initializeRoles()
-  fetchGenres()
+  await fetchGenres()
+  initializeGenreSelections()
 })
 </script>
 
@@ -214,7 +227,7 @@ onMounted(() => {
 
             <div class="roles-container">
               <div class="roles-grid">
-                <div class="genre-option" v-for="genre in genres" :key="genre.id">
+                <div class="genre-option" v-for="genre in availableGenres" :key="genre.id">
                   <label class="checkbox-wrapper">
                     <input
                       type="checkbox"

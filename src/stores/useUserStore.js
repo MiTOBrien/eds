@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 export const useUserStore = defineStore('user', () => {
   // State
@@ -16,7 +16,7 @@ export const useUserStore = defineStore('user', () => {
   const instagram_handle = ref('')
   const x_handle = ref('')
   const roles = ref([])
-  const genres = ref([])
+  const userGenres = ref([])
   const isLoggedIn = ref(false)
   const shouldRefreshReaders = ref(false)
 
@@ -37,8 +37,8 @@ export const useUserStore = defineStore('user', () => {
     roles.value = Array.isArray(userData.roles)
       ? userData.roles.map((role) => (typeof role === 'object' ? role.id : role))
       : []
-    genres.value = Array.isArray(userData.genres)
-      ? userData.genres.map((genre) => (typeof genre === 'object' ? genre.id : genre))
+    userGenres.value = Array.isArray(userData.genres)
+      ? userData.genres
       : []
     isLoggedIn.value = true
 
@@ -47,6 +47,7 @@ export const useUserStore = defineStore('user', () => {
       JSON.stringify({
         ...userData,
         roles: roles.value,
+        genres: userGenres.value,
       }),
     )
   }
@@ -74,7 +75,7 @@ export const useUserStore = defineStore('user', () => {
     instagram_handle.value = ''
     x_handle.value = ''
     roles.value = []
-    genres.value = []
+    userGenres.value = []
     isLoggedIn.value = false
 
     localStorage.removeItem('user')
@@ -112,7 +113,7 @@ export const useUserStore = defineStore('user', () => {
     instagram_handle,
     x_handle,
     roles,
-    genres,
+    userGenres,
     isLoggedIn,
     shouldRefreshReaders,
 
