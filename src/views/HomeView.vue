@@ -13,6 +13,8 @@ const error = ref(null)
 const searchQuery = ref('')
 const selectedRoleFilter = ref('all')
 const selectedServiceFilter = ref('all')
+const selectedGenreFilter = ref('all')
+const availableGenres = ref([])
 
 const roleNameToId = {
   'Arc Reader': 3,
@@ -96,10 +98,33 @@ const formatSocialLink = (platform, handle) => {
   return urls[platform] + cleanHandle
 }
 
+const fetchGenres = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/genres`, {
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+        Accept: 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${await response.text()}`)
+    }
+
+    const data = await response.json()
+    availableGenres.value = Array.isArray(data) ? data : data.genres || []
+    console.log('Data genres:', data.genres)
+    console.log('Fetched genres:', availableGenres.value)
+  } catch (err) {
+    console.error('Error fetching genres:', err)
+  }
+}
+
 const clearFilters = () => {
   searchQuery.value = ''
   selectedRoleFilter.value = 'all'
   selectedServiceFilter.value = 'all'
+  selectedGenreFilter.value = 'all'
 }
 
 const filteredReaders = computed(() => {
@@ -125,12 +150,24 @@ const filteredReaders = computed(() => {
       (selectedServiceFilter.value === 'free' && !reader.charges_for_services) ||
       (selectedServiceFilter.value === 'paid' && reader.charges_for_services)
 
-    return matchesSearch && matchesRole && matchesService
+    const matchesGenre =
+      selectedGenreFilter.value === 'all' ||
+      (Array.isArray(reader.genres) &&
+        reader.genres.some(
+          (g) =>
+            g.id === selectedGenreFilter.value ||
+            g.subgenres?.some((sub) => sub.id === selectedGenreFilter.value),
+        ))
+
+    return matchesSearch && matchesRole && matchesService && matchesGenre
   })
 })
 
 onMounted(() => {
-  if (token.value) fetchReaders()
+  if (token.value) {
+    fetchReaders()
+    fetchGenres()
+  }
 })
 
 watchEffect(() => {
@@ -180,6 +217,16 @@ watchEffect(() => {
             <option value="all">All Services</option>
             <option value="free">Free Services</option>
             <option value="paid">Paid Services</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="genre-filter">Genre Type:</label>
+          <select v-model="selectedGenreFilter" id="genre-filter" class="filter-select">
+            <option value="all">All Genres</option>
+            <option v-for="genre in availableGenres" :key="genre.id" :value="genre.id">
+              {{ genre.name }}
+            </option>
           </select>
         </div>
 
