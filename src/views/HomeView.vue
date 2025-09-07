@@ -195,7 +195,7 @@ watchEffect(() => {
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Search by name, username, or bio..."
+          placeholder="Search by name, username, or about..."
           class="search-input"
         />
       </div>
@@ -299,7 +299,7 @@ watchEffect(() => {
             <h4>Social Media</h4>
             <ul class="social-list">
               <li v-if="reader.facebook">
-                <strong>Facebook:</strong>
+                <strong>Facebook: </strong>
                 <a
                   :href="formatSocialLink('facebook', reader.facebook)"
                   target="_blank"
@@ -309,7 +309,7 @@ watchEffect(() => {
                 </a>
               </li>
               <li v-if="reader.instagram">
-                <strong>Instagram:</strong>
+                <strong>Instagram: </strong>
                 <a
                   :href="formatSocialLink('instagram', reader.instagram)"
                   target="_blank"
@@ -319,7 +319,7 @@ watchEffect(() => {
                 </a>
               </li>
               <li v-if="reader.x">
-                <strong>X:</strong>
+                <strong>X: </strong>
                 <a
                   :href="formatSocialLink('x', reader.x)"
                   target="_blank"

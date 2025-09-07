@@ -109,9 +109,15 @@ const handleSubmit = async (event) => {
     const updatedUser = await response.json()
     userStore.setUser(updatedUser)
     updateStatus.value = 'Profile updated successfully!'
+
+    // Scroll to top after success
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   } catch (error) {
     console.error(error)
     updateStatus.value = 'Error updating profile. Please try again.'
+
+    // Scroll to top after error
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
