@@ -231,10 +231,11 @@ onMounted(async () => {
           <fieldset class="genres-fieldset">
             <legend>Preferred Genres:</legend>
 
-            <div class="roles-container">
-              <div class="roles-grid">
-                <div class="genre-option" v-for="genre in availableGenres" :key="genre.id">
-                  <label class="checkbox-wrapper">
+            <div class="genre-group">
+              <div v-for="genre in availableGenres" :key="genre.id" class="genre-block">
+                <!-- Genre Header -->
+                <div class="genre-header">
+                  <label>
                     <input
                       type="checkbox"
                       :value="genre.id"
@@ -243,18 +244,17 @@ onMounted(async () => {
                     />
                     {{ genre.name }}
                   </label>
+                </div>
 
-                  <!-- Sub-genres -->
-                  <div v-if="selectedGenres.includes(genre.id)" class="sub-genre-row">
-                    <label v-for="sub in genre.subgenres" :key="sub.id" class="sub-genre-option">
-                      <input
-                        type="checkbox"
-                        :value="sub.id"
-                        v-model="selectedSubGenres[genre.id]"
-                      />
-                      {{ sub.name }}
-                    </label>
-                  </div>
+                <!-- Subgenres Inline -->
+                <div
+                  v-if="genre.subgenres && selectedGenres.includes(genre.id)"
+                  class="subgenre-inline"
+                >
+                  <label v-for="sub in genre.subgenres" :key="sub.id" class="subgenre-item">
+                    <input type="checkbox" :value="sub.id" v-model="selectedSubGenres[genre.id]" />
+                    {{ sub.name }}
+                  </label>
                 </div>
               </div>
             </div>
@@ -321,4 +321,34 @@ onMounted(async () => {
   </main>
 </template>
 
-<style scoped></style>
+<style scoped>
+.genre-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.genre-block {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.genre-header {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.subgenre-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.subgenre-item {
+  font-size: 0.9rem;
+  color: #555;
+}
+</style>
