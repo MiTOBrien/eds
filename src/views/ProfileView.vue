@@ -11,6 +11,8 @@ const selectedGenres = ref([]) // Genre IDs selected by user
 const selectedSubGenres = reactive({}) // Subgenre IDs grouped by genre
 const selectedRoles = ref([])
 const updateStatus = ref('')
+const pricingModel = ref('free') // 'free' or 'paid'
+const pricingTiers = ref([{ wordCount: 10000, price: 30 }])
 
 const token = computed(() => userStore.token)
 
@@ -70,6 +72,14 @@ const toggleSubGenres = (genreId) => {
   if (!selectedSubGenres[genreId]) {
     selectedSubGenres[genreId] = []
   }
+}
+
+const addTier = () => {
+  pricingTiers.value.push({ wordCount: null, price: null })
+}
+
+const removeTier = (index) => {
+  pricingTiers.value.splice(index, 1)
 }
 
 // Submit profile update
@@ -226,6 +236,39 @@ onMounted(async () => {
           </fieldset>
         </section>
 
+        <!-- Pricing Section - Only show if user selected reader roles -->
+        <section v-if="isReaderRole" class="form-section">
+          <fieldset class="pricing-fieldset">
+            <legend>Service Pricing:</legend>
+
+            <!-- Free or Paid Toggle -->
+            <div class="pricing-toggle">
+              <label>
+                <input type="radio" value="free" v-model="pricingModel" />
+                I offer my services for free
+              </label>
+              <label>
+                <input type="radio" value="paid" v-model="pricingModel" />
+                I charge based on word count
+              </label>
+            </div>
+
+            <!-- Pricing Tiers -->
+            <div v-if="pricingModel === 'paid'" class="pricing-tiers">
+              <div v-for="(tier, index) in pricingTiers" :key="index" class="pricing-tier">
+                <input
+                  type="number"
+                  v-model.number="tier.wordCount"
+                  placeholder="Word count (e.g. 10000)"
+                />
+                <input type="number" v-model.number="tier.price" placeholder="Price in dollars (e.g. 30)" />
+                <button type="button" @click="removeTier(index)">Remove</button>
+              </div>
+              <button type="button" @click="addTier">Add Tier</button>
+            </div>
+          </fieldset>
+        </section>
+
         <!-- Genres Section - Only show if user selected reader roles -->
         <section v-if="isReaderRole" class="form-section">
           <fieldset class="genres-fieldset">
@@ -322,33 +365,4 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.genre-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.genre-block {
-  border-bottom: 1px solid #eee;
-  padding-bottom: 1rem;
-}
-
-.genre-header {
-  font-weight: bold;
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
-
-.subgenre-inline {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.subgenre-item {
-  font-size: 0.9rem;
-  color: #555;
-}
 </style>
