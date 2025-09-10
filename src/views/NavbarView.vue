@@ -64,6 +64,7 @@ onUnmounted(() => {
     <!-- Left side - Home button -->
     <div class="navbar-left">
       <RouterLink class="nav-link home-link" to="/home">Home</RouterLink>
+      <RouterLink class="nav-link" to="/profile">Profile</RouterLink>
     </div>
 
     <!-- Right side - User dropdown or login -->
@@ -76,7 +77,7 @@ onUnmounted(() => {
           </button>
 
           <div class="dropdown-menu" :class="{ show: isDropdownOpen }">
-            <button class="dropdown-item" @click="viewProfile">View Profile</button>
+            <button class="dropdown-item" @click="viewProfile">Profile</button>
             <button class="dropdown-item" @click="logout">Logout</button>
           </div>
         </div>

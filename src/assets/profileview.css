@@ -243,42 +243,131 @@
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
-.genre-option {
+.genre-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+  gap: 1.5rem;
 }
 
-.genre-option:hover {
-  background-color: #f8f9fa;
+.genre-block {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
 }
 
-.sub-genre-row {
+.genre-header {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.subgenre-inline {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 1rem;
   margin-top: 0.5rem;
-  padding-left: 1.5rem;
 }
 
-.sub-genre-option {
+.subgenre-item {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.pricing-fieldset {
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 0;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-fieldset legend {
+  font-weight: 600;
+  color: #555;
+  padding: 0 1rem;
+  font-size: 1.1rem;
+}
+
+.pricing-toggle {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pricing-toggle label {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.85rem;
-  background-color: #f1f1f1;
-  padding: 0.3rem 0.6rem;
-  border-radius: 4px;
+  gap: 0.5rem;
+  font-weight: normal;
+  color: #555;
   cursor: pointer;
 }
 
-.sub-genre-option input[type='checkbox'] {
-  width: 16px;
-  height: 16px;
+.pricing-toggle input[type='radio'] {
+  width: 18px;
+  height: 18px;
   accent-color: #007bff;
+}
+
+.pricing-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pricing-tier {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.pricing-tier input[type='number'] {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  width: 100%;
+  transition: border-color 0.2s ease;
+}
+
+.pricing-tier input[type='number']:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.pricing-tier button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pricing-tier button:hover {
+  background-color: #c82333;
+}
+
+.pricing-tiers > button {
+  align-self: flex-start;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.95rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pricing-tiers > button:hover {
+  background-color: #0056b3;
 }
 
 
