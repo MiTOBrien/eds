@@ -103,6 +103,8 @@ const handleSubmit = async (event) => {
           first_name: userStore.first_name,
           last_name: userStore.last_name,
           role_ids: selectedRoles.value,
+          charges_for_services: chargesForServices.value,
+          pricing_tiers: chargesForServices.value ? pricingTiers.value : [],
           facebook: userStore.facebook_handle,
           instagram: userStore.instagram_handle,
           x: userStore.x_handle,
