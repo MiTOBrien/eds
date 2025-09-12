@@ -13,6 +13,7 @@ const selectedRoles = ref([])
 const updateStatus = ref('')
 const pricingModel = ref('free') // 'free' or 'paid'
 const pricingTiers = ref([{ wordCount: 10000, price: 30 }])
+const chargesForServices = computed(() => pricingModel.value === 'paid')
 
 const token = computed(() => userStore.token)
 
@@ -104,7 +105,13 @@ const handleSubmit = async (event) => {
           last_name: userStore.last_name,
           role_ids: selectedRoles.value,
           charges_for_services: chargesForServices.value,
-          pricing_tiers: chargesForServices.value ? pricingTiers.value : [],
+          pricing_tiers_attributes: chargesForServices.value
+            ? pricingTiers.value.map((tier) => ({
+                word_count: tier.wordCount,
+                price_cents: tier.price * 100, // convert dollars to cents
+                currency: 'USD',
+              }))
+            : [],
           facebook: userStore.facebook_handle,
           instagram: userStore.instagram_handle,
           x: userStore.x_handle,
@@ -263,7 +270,11 @@ onMounted(async () => {
                   v-model.number="tier.wordCount"
                   placeholder="Word count (e.g. 10000)"
                 />
-                <input type="number" v-model.number="tier.price" placeholder="Price in dollars (e.g. 30)" />
+                <input
+                  type="number"
+                  v-model.number="tier.price"
+                  placeholder="Price in dollars (e.g. 30)"
+                />
                 <button type="button" @click="removeTier(index)">Remove</button>
               </div>
               <button type="button" @click="addTier">Add Tier</button>
@@ -366,5 +377,4 @@ onMounted(async () => {
   </main>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
