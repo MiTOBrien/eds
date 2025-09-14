@@ -110,7 +110,6 @@ const fetchGenres = async () => {
 
     const data = await response.json()
     availableGenres.value = Array.isArray(data) ? data : data.genres || []
-
   } catch (err) {
     console.error('Error fetching genres:', err)
   }
@@ -271,6 +270,21 @@ watchEffect(() => {
             <strong>Contact Email: </strong>
             <a :href="`mailto:${reader.email}`">{{ reader.email }}</a>
           </p>
+
+          <!-- Pricing Tiers -->
+          <div
+            v-if="reader.charges_for_services && reader.pricing_tiers?.length"
+            class="pricing-display"
+          >
+            <strong>Pricing Tiers:</strong>
+            <ul class="pricing-list">
+              <li v-for="(tier, index) in reader.pricing_tiers" :key="index">
+                Up to {{ tier.word_count.toLocaleString() }} words: ${{
+                  (tier.price_cents / 100).toFixed(2)
+                }}
+              </li>
+            </ul>
+          </div>
 
           <!-- Genre & Subgenre Display -->
           <div v-if="reader.genres && reader.genres.length" class="genre-display">
@@ -548,6 +562,23 @@ watchEffect(() => {
 .email a:hover {
   text-decoration: underline;
 }
+
+.pricing-display {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.pricing-display strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.pricing-list {
+  padding-left: 1rem;
+  list-style-type: disc;
+}
+
 
 .reader-bio {
   margin-bottom: 1rem;
