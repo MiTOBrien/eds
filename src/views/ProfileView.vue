@@ -1,29 +1,27 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { useUserStore } from '@/stores/useUserStore'
 import NavbarView from './NavbarView.vue'
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
 
-const availableGenres = ref([]) // All genres from backend
-const selectedGenres = ref([]) // Genre IDs selected by user
-const selectedSubGenres = reactive({}) // Subgenre IDs grouped by genre
+const availableGenres = ref([])
+const selectedGenres = ref([])
+const selectedSubGenres = reactive({})
 const selectedRoles = ref([])
 const updateStatus = ref('')
-const pricingModel = ref('free') // 'free' or 'paid'
-const pricingTiers = ref([{ wordCount: 10000, price: 30 }])
-const chargesForServices = computed(() => pricingModel.value === 'paid')
+
+// ✅ Replace pricingModel with a boolean ref
+const chargesForServices = ref(false)
 
 const token = computed(() => userStore.token)
 
 const READER_ROLE_IDS = [3, 4, 5]
-
 const isReaderRole = computed(() =>
   selectedRoles.value.some((roleId) => READER_ROLE_IDS.includes(Number(roleId))),
 )
 
-// Initialize roles from store
 const initializeRoles = () => {
   if (Array.isArray(userStore.roles)) {
     selectedRoles.value = userStore.roles.map((roleObj) =>
@@ -32,11 +30,18 @@ const initializeRoles = () => {
   }
 }
 
-// Initialize genre and subgenre selections from store
+const pricingTiers = ref(
+  Array.isArray(userStore.pricingTiers) && userStore.pricingTiers.length > 0
+    ? userStore.pricingTiers.map((tier) => ({
+        wordCount: tier.word_count,
+        price: tier.price_cents / 100,
+      }))
+    : [{ wordCount: 10000, price: 30 }],
+)
+
 const initializeGenreSelections = () => {
   if (Array.isArray(userStore.userGenres)) {
     selectedGenres.value = userStore.userGenres.map((genre) => genre.id)
-
     userStore.userGenres.forEach((genre) => {
       if (Array.isArray(genre.subgenres) && genre.subgenres.length > 0) {
         selectedSubGenres[genre.id] = genre.subgenres.map((sub) => sub.id)
@@ -45,7 +50,6 @@ const initializeGenreSelections = () => {
   }
 }
 
-// Fetch all genres from backend
 const fetchGenres = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/genres`, {
@@ -68,7 +72,6 @@ const fetchGenres = async () => {
   }
 }
 
-// Toggle subgenre visibility
 const toggleSubGenres = (genreId) => {
   if (!selectedSubGenres[genreId]) {
     selectedSubGenres[genreId] = []
@@ -83,7 +86,6 @@ const removeTier = (index) => {
   pricingTiers.value.splice(index, 1)
 }
 
-// Submit profile update
 const handleSubmit = async (event) => {
   event.preventDefault()
 
@@ -108,7 +110,7 @@ const handleSubmit = async (event) => {
           pricing_tiers_attributes: chargesForServices.value
             ? pricingTiers.value.map((tier) => ({
                 word_count: tier.wordCount,
-                price_cents: tier.price * 100, // convert dollars to cents
+                price_cents: Math.round(tier.price * 100),
                 currency: 'USD',
               }))
             : [],
@@ -128,19 +130,25 @@ const handleSubmit = async (event) => {
     const updatedUser = await response.json()
     userStore.setUser(updatedUser)
     updateStatus.value = 'Profile updated successfully!'
-
-    // Scroll to top after success
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } catch (error) {
     console.error(error)
     updateStatus.value = 'Error updating profile. Please try again.'
-
-    // Scroll to top after error
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
-// Lifecycle
+// ✅ Sync checkbox state from store
+watch(
+  () => userStore.charges_for_services,
+  (isPaid) => {
+    if (typeof isPaid === 'boolean') {
+      chargesForServices.value = isPaid
+    }
+  },
+  { immediate: true },
+)
+
 onMounted(async () => {
   userStore.restoreFromLocalStorage()
   initializeRoles()
@@ -250,20 +258,16 @@ onMounted(async () => {
           <fieldset class="pricing-fieldset">
             <legend>Service Pricing:</legend>
 
-            <!-- Free or Paid Toggle -->
+            <!-- Checkbox Toggle -->
             <div class="pricing-toggle">
               <label>
-                <input type="radio" value="free" v-model="pricingModel" />
-                I offer my services for free
-              </label>
-              <label>
-                <input type="radio" value="paid" v-model="pricingModel" />
-                I charge based on word count
+                <input type="checkbox" v-model="chargesForServices" />
+                I charge for my services
               </label>
             </div>
 
             <!-- Pricing Tiers -->
-            <div v-if="pricingModel === 'paid'" class="pricing-tiers">
+            <div v-if="chargesForServices" class="pricing-tiers">
               <div v-for="(tier, index) in pricingTiers" :key="index" class="pricing-tier">
                 <input
                   type="number"

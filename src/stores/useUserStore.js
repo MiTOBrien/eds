@@ -19,6 +19,7 @@ export const useUserStore = defineStore('user', () => {
   const userGenres = ref([])
   const isLoggedIn = ref(false)
   const shouldRefreshReaders = ref(false)
+  const charges_for_services = ref(false)
   const pricingTiers = ref([])
 
   // Actions
@@ -39,6 +40,7 @@ export const useUserStore = defineStore('user', () => {
       ? userData.roles.map((role) => (typeof role === 'object' ? role.id : role))
       : []
     userGenres.value = Array.isArray(userData.genres) ? userData.genres : []
+    charges_for_services.value = !!userData.charges_for_services
     pricingTiers.value = Array.isArray(userData.pricing_tiers) ? userData.pricing_tiers : []
     isLoggedIn.value = true
 
@@ -77,6 +79,8 @@ export const useUserStore = defineStore('user', () => {
     x_handle.value = ''
     roles.value = []
     userGenres.value = []
+    charges_for_services.value = false
+    pricingTiers.value = []
     isLoggedIn.value = false
 
     localStorage.removeItem('user')
@@ -117,6 +121,7 @@ export const useUserStore = defineStore('user', () => {
     userGenres,
     isLoggedIn,
     shouldRefreshReaders,
+    charges_for_services,
     pricingTiers,
 
     // Actions

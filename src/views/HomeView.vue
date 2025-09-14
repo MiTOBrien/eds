@@ -30,8 +30,6 @@ const roleIdToName = {
 }
 
 const fetchReaders = async () => {
-  console.log('isLoggedIn:', userStore.isLoggedIn)
-  console.log('Auth token:', userStore.token)
   console.log('Fetching readers...')
   try {
     loading.value = true
@@ -54,14 +52,13 @@ const fetchReaders = async () => {
     }
 
     const data = await response.json()
-    console.log('Fetched data:', data)
+
     readers.value = data.readers || []
   } catch (err) {
     console.log('Error fetching readers:', err)
     error.value = err.message
   } finally {
     loading.value = false
-    console.log('Loading set to false.')
   }
 }
 
@@ -113,8 +110,7 @@ const fetchGenres = async () => {
 
     const data = await response.json()
     availableGenres.value = Array.isArray(data) ? data : data.genres || []
-    console.log('Data genres:', data.genres)
-    console.log('Fetched genres:', availableGenres.value)
+
   } catch (err) {
     console.error('Error fetching genres:', err)
   }
@@ -172,7 +168,6 @@ onMounted(() => {
 
 watchEffect(() => {
   if (userStore.shouldRefreshReaders.value) {
-    console.log('Watcher triggered:', userStore.shouldRefreshReaders.value)
     fetchReaders()
     userStore.resetRefreshFlag()
   }
