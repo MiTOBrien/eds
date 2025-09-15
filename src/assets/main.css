@@ -14,10 +14,32 @@ html {
 
 body {
   background-color: #ffffff;
-  background-image: url('./book-with-yellow-cover.jpg');
   background-size: cover;
   background-position: center;
 }
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  width: 250px; /* Limit width to 250px */
+  height: 100%;
+  background-image: url('/bookcase.jpg'); /* Update path */
+  background-repeat: repeat-y;
+  background-size: 100% auto; /* Scale image to fit width */
+  background-position: top center;
+  z-index: -1;
+}
+
+body::before {
+  left: 0;
+}
+
+body::after {
+  right: 0;
+}
+
 
 h1,
 h2,
