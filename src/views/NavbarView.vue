@@ -37,9 +37,9 @@ const logout = () => {
   router.push('/')
 }
 
-const viewProfile = () => {
+const changePassword = () => {
   closeDropdown()
-  router.push('/profile')
+  router.push('/change-password')
 }
 
 // Close dropdown when clicking outside
@@ -77,7 +77,7 @@ onUnmounted(() => {
           </button>
 
           <div class="dropdown-menu" :class="{ show: isDropdownOpen }">
-            <button class="dropdown-item" @click="viewProfile">Profile</button>
+            <button class="dropdown-item" @click="changePassword">Change Password</button>
             <button class="dropdown-item" @click="logout">Logout</button>
           </div>
         </div>
