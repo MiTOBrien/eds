@@ -12,11 +12,19 @@ const token = computed(() => userStore.token)
 const router = useRouter()
 const { loading, error, get } = useApi()
 
+const roleNameToId = {
+  'Author': 2,
+  'Arc Reader': 3,
+  'Beta Reader': 4,
+  'Proof Reader': 5,
+}
+
 // State
 const users = ref([])
 const authors = ref([])
 const searchQuery = ref('')
-const selectedRole = ref('')
+const selectedRoleFilter = ref('all')
+const selectedServiceFilter = ref('all')
 
 // Computed property to check if the user has the 'Admin' role
 const ADMIN_ROLE_ID = 1
@@ -50,6 +58,7 @@ const fetchUsers = async () => {
 
     const data = await response.json()
     users.value = Array.isArray(data) ? data : data.users || []
+
   } catch (err) {
     console.error('Error fetching users:', err)
     error.value = err.message
@@ -75,14 +84,34 @@ const refreshData = async () => {
   await Promise.all([fetchUsers()])
 }
 
-const filteredUsers = computed(() =>
-  users.value.filter(
-    (user) =>
-      (!selectedRole.value || user.roles.includes(selectedRole.value)) &&
-      (user.name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchQuery.value.toLowerCase())),
-  ),
-)
+const clearFilters = () => {
+  searchQuery.value = ''
+  selectedRoleFilter.value = 'all'
+  selectedServiceFilter.value = 'all'
+}
+
+const filteredUsers = computed(() => {
+  return users.value.filter((user) => {
+    const matchesSearch =
+      !searchQuery.value ||
+      user.username?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      user.first_name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      user.last_name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      user.bio?.toLowerCase().includes(searchQuery.value.toLowerCase())
+
+    const matchesRole =
+      selectedRoleFilter.value === 'all' ||
+      (Array.isArray(user.roles) &&
+        user.roles.some((r) => r.id === roleNameToId[selectedRoleFilter.value]))
+
+    const matchesService =
+      selectedServiceFilter.value === 'all' ||
+      (selectedServiceFilter.value === 'free' && !user.charges_for_services) ||
+      (selectedServiceFilter.value === 'paid' && user.charges_for_services)
+
+    return matchesSearch && matchesRole && matchesService
+  })
+})
 
 // Lifecycle
 onMounted(async () => {
@@ -121,40 +150,55 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div class="filter-controls">
-        <input v-model="searchQuery" placeholder="Search by name or email" />
-        <select v-model="selectedRole">
-          <option value="">All Roles</option>
-          <option value="Author">Author</option>
-          <option value="Arc Reader">Arc Reader</option>
-          <option value="Beta Reader">Beta Reader</option>
-          <option value="Proof Reader">Proof Reader</option>
-        </select>
+      <!-- Search and Filter Section -->
+      <div class="search-filters">
+        <div class="search-bar">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search by name, username, or about..."
+            class="search-input"
+          />
+        </div>
+
+        <div class="filters">
+          <div class="filter-group">
+            <label for="role-filter">Reader Type:</label>
+            <select v-model="selectedRoleFilter" id="role-filter" class="filter-select">
+              <option value="all">All Types</option>
+              <option value="Author">Authors</option>
+              <option value="Arc Reader">ARC Readers</option>
+              <option value="Beta Reader">Beta Readers</option>
+              <option value="Proof Reader">Proof Readers</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="service-filter">Service Type:</label>
+            <select v-model="selectedServiceFilter" id="service-filter" class="filter-select">
+              <option value="all">All Services</option>
+              <option value="free">Free Services</option>
+              <option value="paid">Paid Services</option>
+            </select>
+          </div>
+
+          <button @click="clearFilters" class="clear-filters-btn">Clear Filters</button>
+        </div>
       </div>
 
       <!-- Admin Content -->
       <div v-if="!loading && !error" class="admin-content">
         <!-- Users Section -->
         <section class="admin-section">
-          <h4>Users ({{ users.length }})</h4>
-          <div v-if="users.length === 0" class="empty-state">No users found</div>
+          <h4>Users ({{ filteredUsers.length }})</h4>
+          <div v-if="filteredUsers.length === 0" class="empty-state">No users found</div>
           <ul v-if="filteredUsers.length" class="admin-list">
             <li v-for="user in filteredUsers" :key="user.id" class="admin-item">
               <strong>{{ user.name || user.email }}</strong>
               <span class="user-email">{{ user.email }}</span>
-              <span class="user-roles">{{ user.roles?.join(', ') || 'No roles' }}</span>
-            </li>
-          </ul>
-        </section>
-
-        <!-- Authors Section -->
-        <section class="admin-section">
-          <h4>Authors ({{ authors.length }})</h4>
-          <div v-if="authors.length === 0" class="empty-state">No authors found</div>
-          <ul v-else class="admin-list">
-            <li v-for="author in authors" :key="author.id" class="admin-item">
-              <strong>{{ author.name }}</strong>
-              <span class="author-bio">{{ author.bio || 'No bio' }}</span>
+              <span class="user-roles">
+                {{ user.roles?.map((r) => r.role).join(', ') || 'No roles' }}
+              </span>
             </li>
           </ul>
         </section>
@@ -269,4 +313,71 @@ onMounted(async () => {
   flex: 1;
 }
 
+/* Search and Filters */
+.search-filters {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.search-bar {
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.filter-select {
+  padding: 0.5rem;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 150px;
+}
+
+.clear-filters-btn {
+  padding: 0.5rem 1rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.clear-filters-btn:hover {
+  background: #545b62;
+}
 </style>
