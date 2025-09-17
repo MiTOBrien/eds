@@ -58,13 +58,18 @@ const fetchUsers = async () => {
   }
 }
 
-// const fetchAuthors = async () => {
-//   try {
-//     authors.value = await get('/authors')
-//   } catch (err) {
-//     console.error('Failed to fetch authors:', err)
-//   }
-// }
+const roleSummary = ref([])
+
+const fetchRoleSummary = async () => {
+  const response = await fetch(`${API_BASE_URL}/admin/role_summary`, {
+    headers: {
+      Authorization: `Bearer ${token.value}`,
+      Accept: 'application/json',
+    },
+  })
+  const data = await response.json()
+  roleSummary.value = data.summary || []
+}
 
 const refreshData = async () => {
   await Promise.all([fetchUsers()])
@@ -89,6 +94,7 @@ onMounted(async () => {
 
   // Fetch initial data
   await refreshData()
+  await fetchRoleSummary()
 })
 </script>
 
@@ -248,4 +254,19 @@ onMounted(async () => {
   padding: 50px 20px;
   color: #dc3545;
 }
+
+.role-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.role-card {
+  background: #f1f3f5;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  flex: 1;
+}
+
 </style>
