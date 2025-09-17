@@ -12,6 +12,13 @@ const firstName = computed(() => userStore.first_name)
 const lastName = computed(() => userStore.last_name)
 const email = computed(() => userStore.email)
 
+// Computed property to check if the user has the 'Admin' role
+const ADMIN_ROLE_ID = 1
+const isAdmin = computed(() =>
+  Array.isArray(userStore.roles) &&
+  userStore.roles.includes(ADMIN_ROLE_ID)
+)
+
 // Computed property to get the display name (username, full name, or email as fallback)
 const displayName = computed(() => {
   if (username.value) return username.value
@@ -65,6 +72,7 @@ onUnmounted(() => {
     <div class="navbar-left">
       <RouterLink class="nav-link home-link" to="/home">Home</RouterLink>
       <RouterLink class="nav-link" to="/profile">Profile</RouterLink>
+      <router-link v-if="isAdmin" to="/admin" class="nav-link">Admin Panel</router-link>
     </div>
 
     <!-- Right side - User dropdown or login -->
