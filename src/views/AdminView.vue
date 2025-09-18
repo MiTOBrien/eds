@@ -13,7 +13,7 @@ const router = useRouter()
 const { loading, error, get } = useApi()
 
 const roleNameToId = {
-  'Author': 2,
+  Author: 2,
   'Arc Reader': 3,
   'Beta Reader': 4,
   'Proof Reader': 5,
@@ -58,7 +58,6 @@ const fetchUsers = async () => {
 
     const data = await response.json()
     users.value = Array.isArray(data) ? data : data.users || []
-
   } catch (err) {
     console.error('Error fetching users:', err)
     error.value = err.message
@@ -192,13 +191,17 @@ onMounted(async () => {
         <section class="admin-section">
           <h4>Users ({{ filteredUsers.length }})</h4>
           <div v-if="filteredUsers.length === 0" class="empty-state">No users found</div>
-          <ul v-if="filteredUsers.length" class="admin-list">
-            <li v-for="user in filteredUsers" :key="user.id" class="admin-item">
-              <strong>{{ user.name || user.email }}</strong>
-              <span class="user-email">{{ user.email }}</span>
-              <span class="user-roles">
-                {{ user.roles?.map((r) => r.role).join(', ') || 'No roles' }}
-              </span>
+          <ul v-if="filteredUsers.length" class="admin-card-grid">
+            <li v-for="user in filteredUsers" :key="user.id" class="admin-card">
+              <div class="card-line"><strong>Username:</strong> {{ user.username || '—' }}</div>
+              <div class="card-line"><strong>Email:</strong> {{ user.email || '—' }}</div>
+              <div class="card-line">
+                <strong>Roles:</strong>
+                <span v-if="user.roles?.length">
+                  {{ user.roles.map((r) => r.role).join(', ') }}
+                </span>
+                <span v-else>No roles</span>
+              </div>
             </li>
           </ul>
         </section>
@@ -230,20 +233,23 @@ onMounted(async () => {
   border-radius: 8px;
 }
 
-.admin-list {
-  list-style: none;
+.admin-card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
   padding: 0;
+  list-style: none;
 }
 
-.admin-item {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 15px;
-  border-bottom: 1px solid #dee2e6;
+.admin-card {
+  flex: 1 1 calc(33.333% - 20px); /* 3 cards across */
   background: white;
-  margin-bottom: 10px;
-  border-radius: 4px;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  min-width: 250px;
+  max-width: 300px;
 }
 
 .user-email {
@@ -379,5 +385,17 @@ onMounted(async () => {
 
 .clear-filters-btn:hover {
   background: #545b62;
+}
+
+@media (max-width: 900px) {
+  .admin-card {
+    flex: 1 1 calc(50% - 20px); /* 2 cards across */
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-card {
+    flex: 1 1 100%; /* 1 card per row */
+  }
 }
 </style>
