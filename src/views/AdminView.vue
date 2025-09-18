@@ -25,6 +25,10 @@ const authors = ref([])
 const searchQuery = ref('')
 const selectedRoleFilter = ref('all')
 const selectedServiceFilter = ref('all')
+const genres = ref([])
+const newGenreName = ref('')
+const newSubgenreName = ref('')
+const selectedParentId = ref(null)
 
 // Computed property to check if the user has the 'Admin' role
 const ADMIN_ROLE_ID = 1
@@ -79,6 +83,50 @@ const fetchRoleSummary = async () => {
   roleSummary.value = data.summary || []
 }
 
+const fetchGenres = async () => {
+  const response = await fetch(`${API_BASE_URL}/admin/genres`, {
+    headers: {
+      Authorization: `Bearer ${token.value}`,
+      Accept: 'application/json',
+    },
+  })
+  const data = await response.json()
+  console.log('Fetched genres:', data)
+  genres.value = data
+}
+
+const createGenre = async () => {
+  if (!newGenreName.value) return
+  await fetch(`${API_BASE_URL}/genres`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token.value}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name: newGenreName.value }),
+  })
+  newGenreName.value = ''
+  await fetchGenres()
+}
+
+const createSubgenre = async () => {
+  if (!newSubgenreName.value || !selectedParentId.value) return
+  await fetch(`${API_BASE_URL}/genres`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token.value}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: newSubgenreName.value,
+      parent_id: selectedParentId.value,
+    }),
+  })
+  newSubgenreName.value = ''
+  selectedParentId.value = null
+  await fetchGenres()
+}
+
 const refreshData = async () => {
   await Promise.all([fetchUsers()])
 }
@@ -123,6 +171,7 @@ onMounted(async () => {
   // Fetch initial data
   await refreshData()
   await fetchRoleSummary()
+  await fetchGenres()
 })
 </script>
 
@@ -204,6 +253,35 @@ onMounted(async () => {
               </div>
             </li>
           </ul>
+        </section>
+
+        <section class="admin-section">
+          <h4>Genres</h4>
+
+          <ul class="genre-list">
+            <li v-for="genre in genres" :key="genre.id" class="genre-item">
+              <strong>{{ genre.name }}</strong>
+              <ul class="subgenre-list">
+                <li v-for="sub in genre.subgenres" :key="sub.id">{{ sub.name }}</li>
+              </ul>
+            </li>
+          </ul>
+
+          <div class="genre-form">
+            <input v-model="newGenreName" placeholder="New genre name" />
+            <button @click="createGenre">Add Genre</button>
+          </div>
+
+          <div class="subgenre-form">
+            <select v-model="selectedParentId">
+              <option disabled value="">Select parent genre</option>
+              <option v-for="genre in genres" :key="genre.id" :value="genre.id">
+                {{ genre.name }}
+              </option>
+            </select>
+            <input v-model="newSubgenreName" placeholder="New subgenre name" />
+            <button @click="createSubgenre">Add Subgenre</button>
+          </div>
         </section>
 
         <!-- Refresh Button -->
