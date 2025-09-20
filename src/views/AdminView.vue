@@ -21,7 +21,6 @@ const roleNameToId = {
 
 // State
 const users = ref([])
-const authors = ref([])
 const searchQuery = ref('')
 const selectedRoleFilter = ref('all')
 const selectedServiceFilter = ref('all')
@@ -97,7 +96,7 @@ const fetchGenres = async () => {
 
 const createGenre = async () => {
   if (!newGenreName.value) return
-  await fetch(`${API_BASE_URL}/genres`, {
+  await fetch(`${API_BASE_URL}/admin/genres`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token.value}`,
@@ -111,7 +110,7 @@ const createGenre = async () => {
 
 const createSubgenre = async () => {
   if (!newSubgenreName.value || !selectedParentId.value) return
-  await fetch(`${API_BASE_URL}/genres`, {
+  await fetch(`${API_BASE_URL}/admin/genres`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token.value}`,
