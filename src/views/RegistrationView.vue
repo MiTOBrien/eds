@@ -12,30 +12,42 @@ const password = ref('')
 const confirmPassword = ref('')
 const selectedRoles = ref([]) // should now contain role_ids like [2, 3, 4]
 const chargesForServices = ref(false)
-const subscriptionPlan = ref('monthly') // 'monthly' or 'annual'
+const subscriptionPlan = ref('monthly') // 'monthly' 'quarterly' or 'annual'
 const freePlanAcknowledgment = ref(false)
 const router = useRouter()
 const userStore = useUserStore()
 
 // Computed property to determine if user needs paid subscription
 const needsPaidSubscription = computed(() => {
-  const paidRoleIds = [3, 4, 5] // arc reader, beta reader, proofreader
+  const paidRoleIds = [3, 4, 5]
   const hasPaidRole = selectedRoles.value.some((id) => paidRoleIds.includes(id))
-  return hasPaidRole && chargesForServices.value
+  return hasPaidRole && chargesForServices.value === true
 })
 
 // Computed property to determine subscription type
 const subscriptionType = computed(() => {
-  if (needsPaidSubscription.value) {
-    return subscriptionPlan.value === 'annual' ? 'paid_annual' : 'paid_monthly'
+  if (!needsPaidSubscription.value) return 'free'
+  switch (subscriptionPlan.value) {
+    case 'quarterly':
+      return 'paid_quarterly'
+    case 'annual':
+      return 'paid_annual'
+    default:
+      return 'paid_monthly'
   }
-  return 'free'
 })
 
 // Computed property for subscription price display
 const subscriptionPrice = computed(() => {
   if (!needsPaidSubscription.value) return 'Free'
-  return subscriptionPlan.value === 'annual' ? '$100/year' : '$10/month'
+  switch (subscriptionPlan.value) {
+    case 'quarterly':
+      return '$12.50/month (billed quarterly)'
+    case 'annual':
+      return '$10.00/month (billed annually)'
+    default:
+      return '$15.00/month'
+  }
 })
 
 const register = async () => {
@@ -170,27 +182,22 @@ const register = async () => {
             <legend>Register as:</legend>
             <div class="roles-grid">
               <div class="role-option">
-                <input type="checkbox" id="author" value="2" v-model="selectedRoles" />
+                <input type="checkbox" id="author" :value="2" v-model="selectedRoles" />
                 <label for="author">Author</label>
               </div>
 
               <div class="role-option">
-                <input type="checkbox" id="arcreader" value="3" v-model="selectedRoles" />
+                <input type="checkbox" id="arcreader" :value="3" v-model="selectedRoles" />
                 <label for="arcreader">ARC Reader</label>
               </div>
 
               <div class="role-option">
-                <input type="checkbox" id="betareader" value="4" v-model="selectedRoles" />
+                <input type="checkbox" id="betareader" :value="4" v-model="selectedRoles" />
                 <label for="betareader">Beta Reader</label>
               </div>
 
               <div class="role-option">
-                <input
-                  type="checkbox"
-                  id="proofreader"
-                  value="5"
-                  v-model="selectedRoles"
-                />
+                <input type="checkbox" id="proofreader" :value="5" v-model="selectedRoles" />
                 <label for="proofreader">Proof Reader</label>
               </div>
             </div>
@@ -200,7 +207,9 @@ const register = async () => {
         <!-- Service Pricing Question -->
         <div
           class="form-group"
-          v-if="needsPaidSubscription || selectedRoles.some(role => [3, 4, 5].includes(Number(role)))"
+          v-if="
+            needsPaidSubscription || selectedRoles.some((role) => [3, 4, 5].includes(Number(role)))
+          "
         >
           <fieldset class="service-pricing-fieldset">
             <legend>Do you charge authors for your services?</legend>
@@ -211,11 +220,18 @@ const register = async () => {
                   id="free-services"
                   :value="false"
                   v-model="chargesForServices"
+                  @change="chargesForServices = false"
                 />
                 <label for="free-services">No, I provide free services</label>
               </div>
               <div class="pricing-option">
-                <input type="radio" id="paid-services" :value="true" v-model="chargesForServices" />
+                <input
+                  type="radio"
+                  id="paid-services"
+                  :value="true"
+                  v-model="chargesForServices"
+                  @change="chargesForServices = true"
+                />
                 <label for="paid-services">Yes, I charge a fee for my services</label>
               </div>
             </div>
@@ -272,8 +288,24 @@ const register = async () => {
                   <label for="monthly-plan" class="plan-label">
                     <div class="plan-details">
                       <h3>Monthly Plan</h3>
-                      <p class="price">$10/month</p>
+                      <p class="price">$15/month</p>
                       <p class="plan-description">Flexible monthly billing</p>
+                    </div>
+                  </label>
+                </div>
+
+                <div class="plan-option" :class="{ active: subscriptionPlan === 'quarterly' }">
+                  <input
+                    type="radio"
+                    id="quarterly-plan"
+                    value="quarterly"
+                    v-model="subscriptionPlan"
+                  />
+                  <label for="quarterly-plan" class="plan-label">
+                    <div class="plan-details">
+                      <h3>Quarterly Plan</h3>
+                      <p class="price">$12.50/month</p>
+                      <p class="plan-description">Billed every 3 months ($37.50)</p>
                     </div>
                   </label>
                 </div>
@@ -284,7 +316,7 @@ const register = async () => {
                     <div class="plan-details">
                       <h3>Annual Plan</h3>
                       <p class="price">$100/year</p>
-                      <p class="plan-description">Save $20 with annual billing</p>
+                      <p class="plan-description">Save with annual billing</p>
                       <span class="savings-badge">Best Value</span>
                     </div>
                   </label>
