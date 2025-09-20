@@ -69,6 +69,21 @@ const fetchUsers = async () => {
   }
 }
 
+const disableUser = async (userId) => {
+  const confirmed = confirm('Are you sure you want to disable this account?')
+  if (!confirmed) return
+
+  await fetch(`${API_BASE_URL}/admin/users/${userId}/disable`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token.value}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  await fetchUsers()
+}
+
 const roleSummary = ref([])
 
 const fetchRoleSummary = async () => {
@@ -241,6 +256,10 @@ onMounted(async () => {
           <div v-if="filteredUsers.length === 0" class="empty-state">No users found</div>
           <ul v-if="filteredUsers.length" class="admin-card-grid">
             <li v-for="user in filteredUsers" :key="user.id" class="admin-card">
+              <button v-if="!user.disabled" @click="disableUser(user.id)" class="disable-btn">
+                Disable Account
+              </button>
+              <span v-else class="disabled-label">Account Disabled</span>
               <div class="card-line"><strong>Username:</strong> {{ user.username || '—' }}</div>
               <div class="card-line"><strong>Email:</strong> {{ user.email || '—' }}</div>
               <div class="card-line">

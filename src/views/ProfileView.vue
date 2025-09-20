@@ -12,7 +12,6 @@ const selectedSubGenres = reactive({})
 const selectedRoles = ref([])
 const updateStatus = ref('')
 
-// ✅ Replace pricingModel with a boolean ref
 const chargesForServices = ref(false)
 
 const token = computed(() => userStore.token)
@@ -138,7 +137,6 @@ const handleSubmit = async (event) => {
   }
 }
 
-// ✅ Sync checkbox state from store
 watch(
   () => userStore.charges_for_services,
   (isPaid) => {
