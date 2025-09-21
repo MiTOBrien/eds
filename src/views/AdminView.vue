@@ -69,11 +69,12 @@ const fetchUsers = async () => {
   }
 }
 
-const disableUser = async (userId) => {
-  const confirmed = confirm('Are you sure you want to disable this account?')
+const toggleUserStatus = async (user) => {
+  const action = user.disabled ? 'enable' : 'disable'
+  const confirmed = confirm(`Are you sure you want to ${action} this account?`)
   if (!confirmed) return
 
-  await fetch(`${API_BASE_URL}/admin/users/${userId}/disable`, {
+  await fetch(`${API_BASE_URL}/admin/users/${user.id}/${action}`, {
     method: 'PATCH',
     headers: {
       Authorization: `Bearer ${token.value}`,
@@ -81,7 +82,7 @@ const disableUser = async (userId) => {
     },
   })
 
-  await fetchUsers()
+  await fetchUsers() // Refresh the list
 }
 
 const roleSummary = ref([])
@@ -256,10 +257,17 @@ onMounted(async () => {
           <div v-if="filteredUsers.length === 0" class="empty-state">No users found</div>
           <ul v-if="filteredUsers.length" class="admin-card-grid">
             <li v-for="user in filteredUsers" :key="user.id" class="admin-card">
-              <button v-if="!user.disabled" @click="disableUser(user.id)" class="disable-btn">
-                Disable Account
-              </button>
-              <span v-else class="disabled-label">Account Disabled</span>
+              <div class="user-status">
+                <button @click="toggleUserStatus(user)" :class="['toggle-btn', user.disabled ? 'enable' : 'disable']"
+>
+                  {{ user.disabled ? 'Enable Account' : 'Disable Account' }}
+                </button>
+
+                <span v-if="user.disabled" class="disabled-label"> Account Disabled </span>
+              </div>
+              <div class="card-line">
+                <strong>Name:</strong> {{ user.first_name || '—' }} {{ user.last_name || '—' }}
+              </div>
               <div class="card-line"><strong>Username:</strong> {{ user.username || '—' }}</div>
               <div class="card-line"><strong>Email:</strong> {{ user.email || '—' }}</div>
               <div class="card-line">
@@ -413,6 +421,26 @@ onMounted(async () => {
   border-radius: 8px;
   text-align: center;
   flex: 1;
+}
+
+.user-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.toggle-btn.enable {
+  background-color: #85ee89; /* green */
+}
+
+.toggle-btn.disable {
+  background-color: #f38077; /* red */
+}
+
+.disabled-label {
+  color: #d32f2f;
+  font-weight: bold;
 }
 
 /* Search and Filters */
