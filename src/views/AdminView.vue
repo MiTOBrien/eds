@@ -24,6 +24,7 @@ const users = ref([])
 const searchQuery = ref('')
 const selectedRoleFilter = ref('all')
 const selectedServiceFilter = ref('all')
+const selectedAccountStatusFilter = ref('all')
 const genres = ref([])
 const newGenreName = ref('')
 const newSubgenreName = ref('')
@@ -150,6 +151,7 @@ const clearFilters = () => {
   searchQuery.value = ''
   selectedRoleFilter.value = 'all'
   selectedServiceFilter.value = 'all'
+  selectedAccountStatusFilter.value = 'all'
 }
 
 const filteredUsers = computed(() => {
@@ -171,7 +173,12 @@ const filteredUsers = computed(() => {
       (selectedServiceFilter.value === 'free' && !user.charges_for_services) ||
       (selectedServiceFilter.value === 'paid' && user.charges_for_services)
 
-    return matchesSearch && matchesRole && matchesService
+    const matchesAccountStatus =
+      selectedAccountStatusFilter.value === 'all' ||
+      (selectedAccountStatusFilter.value === 'enabled' && !user.disabled) ||
+      (selectedAccountStatusFilter.value === 'disabled' && user.disabled)
+
+    return matchesSearch && matchesRole && matchesService && matchesAccountStatus
   })
 })
 
@@ -242,6 +249,15 @@ onMounted(async () => {
               <option value="all">All Services</option>
               <option value="free">Free Services</option>
               <option value="paid">Paid Services</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="account-status-filter">Account Status:</label>
+            <select v-model="selectedAccountStatusFilter" id="account-status-filter" class="filter-select">
+              <option value="all">All Statuses</option>
+              <option value="enabled">Enabled</option>
+              <option value="disabled">Disabled</option>
             </select>
           </div>
 

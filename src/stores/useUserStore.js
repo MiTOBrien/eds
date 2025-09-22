@@ -21,6 +21,7 @@ export const useUserStore = defineStore('user', () => {
   const shouldRefreshReaders = ref(false)
   const charges_for_services = ref(false)
   const pricingTiers = ref([])
+  const disabled = ref(false)
 
   // Actions
   function login(userData) {
@@ -42,6 +43,7 @@ export const useUserStore = defineStore('user', () => {
     userGenres.value = Array.isArray(userData.genres) ? userData.genres : []
     charges_for_services.value = !!userData.charges_for_services
     pricingTiers.value = Array.isArray(userData.pricing_tiers) ? userData.pricing_tiers : []
+    disabled.value = !!userData.disabled
     isLoggedIn.value = true
 
     localStorage.setItem(
@@ -81,6 +83,7 @@ export const useUserStore = defineStore('user', () => {
     userGenres.value = []
     charges_for_services.value = false
     pricingTiers.value = []
+    disabled.value = false
     isLoggedIn.value = false
 
     localStorage.removeItem('user')
@@ -123,6 +126,7 @@ export const useUserStore = defineStore('user', () => {
     shouldRefreshReaders,
     charges_for_services,
     pricingTiers,
+    disabled,
 
     // Actions
     login,
