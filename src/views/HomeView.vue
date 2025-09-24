@@ -161,6 +161,7 @@ const filteredReaders = computed(() => {
 onMounted(() => {
   if (token.value) {
     fetchReaders()
+    console.log('Readers:', readers.value)
     fetchGenres()
   }
 })
@@ -283,6 +284,14 @@ watchEffect(() => {
                   (tier.price_cents / 100).toFixed(2)
                 }}
               </li>
+            </ul>
+          </div>
+
+          <!-- Payment Options -->
+          <div v-if="Array.isArray(reader.payment_options) && reader.payment_options.length">
+            <strong>Preferred Payment:</strong>
+            <ul>
+              <li v-for="method in reader.payment_options" :key="method">{{ method }}</li>
             </ul>
           </div>
 
@@ -578,7 +587,6 @@ watchEffect(() => {
   padding-left: 1rem;
   list-style-type: disc;
 }
-
 
 .reader-bio {
   margin-bottom: 1rem;

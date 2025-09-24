@@ -21,6 +21,7 @@ export const useUserStore = defineStore('user', () => {
   const shouldRefreshReaders = ref(false)
   const charges_for_services = ref(false)
   const pricingTiers = ref([])
+  const payment_options = ref([])  
   const disabled = ref(false)
 
   // Actions
@@ -43,6 +44,7 @@ export const useUserStore = defineStore('user', () => {
     userGenres.value = Array.isArray(userData.genres) ? userData.genres : []
     charges_for_services.value = !!userData.charges_for_services
     pricingTiers.value = Array.isArray(userData.pricing_tiers) ? userData.pricing_tiers : []
+    payment_options.value = Array.isArray(userData.payment_options) ? userData.payment_options : []
     disabled.value = !!userData.disabled
     isLoggedIn.value = true
 
@@ -83,6 +85,7 @@ export const useUserStore = defineStore('user', () => {
     userGenres.value = []
     charges_for_services.value = false
     pricingTiers.value = []
+    payment_options.value = []
     disabled.value = false
     isLoggedIn.value = false
 
@@ -127,6 +130,7 @@ export const useUserStore = defineStore('user', () => {
     charges_for_services,
     pricingTiers,
     disabled,
+    payment_options,
 
     // Actions
     login,

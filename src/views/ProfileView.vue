@@ -118,6 +118,7 @@ const handleSubmit = async (event) => {
           x: userStore.x_handle,
           bio: userStore.bio,
           genre_ids: allGenreSelections,
+          payment_options: userStore.payment_options || [],
         },
       }),
     })
@@ -149,6 +150,11 @@ watch(
 
 onMounted(async () => {
   userStore.restoreFromLocalStorage()
+
+  if (!Array.isArray(userStore.payment_options)) {
+    userStore.payment_options = []
+  }
+
   initializeRoles()
   await fetchGenres()
   initializeGenreSelections()
@@ -282,6 +288,23 @@ onMounted(async () => {
               <button type="button" @click="addTier">Add Tier</button>
             </div>
           </fieldset>
+        </section>
+
+        <!-- Payment Options Section -->
+        <section>
+          <div class="form-group">
+            <label for="payment-options">Preferred Payment Methods:</label>
+            <select
+              id="payment-options"
+              v-model="userStore.payment_options"
+              multiple
+            >
+            <option value="paypal">PayPal</option>
+            <option value="venmo">Venmo</option>
+            <option value="zelle">Zelle</option>
+            <option value="cashapp">Cash App</option>
+            </select>
+          </div>
         </section>
 
         <!-- Genres Section - Only show if user selected reader roles -->
