@@ -293,17 +293,25 @@ onMounted(async () => {
         <!-- Payment Options Section -->
         <section>
           <div class="form-group">
-            <label for="payment-options">Preferred Payment Methods:</label>
-            <select
-              id="payment-options"
-              v-model="userStore.payment_options"
-              multiple
-            >
-            <option value="paypal">PayPal</option>
-            <option value="venmo">Venmo</option>
-            <option value="zelle">Zelle</option>
-            <option value="cashapp">Cash App</option>
-            </select>
+            <label>Preferred Payment Methods:</label>
+            <div class="checkbox-group">
+              <label>
+                <input type="checkbox" value="paypal" v-model="userStore.payment_options" />
+                PayPal
+              </label>
+              <label>
+                <input type="checkbox" value="venmo" v-model="userStore.payment_options" />
+                Venmo
+              </label>
+              <label>
+                <input type="checkbox" value="zelle" v-model="userStore.payment_options" />
+                Zelle
+              </label>
+              <label>
+                <input type="checkbox" value="cashapp" v-model="userStore.payment_options" />
+                Cash App
+              </label>
+            </div>
           </div>
         </section>
 
