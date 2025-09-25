@@ -257,6 +257,21 @@ onMounted(async () => {
           </fieldset>
         </section>
 
+        <section v-if="isReaderRole" class="form-section">
+          <fieldset class="turnaround-fieldset">
+            <legend>Estimated Turnaround Time:</legend>
+            <div class="form-group">
+              <label for="turnaround-time">Timefraome:</label>
+              <select id="turnaround-time" v-model="userStore.turnaround_time">
+                <option :value="1">Less than 1 week</option>
+                <option :value="2">1-2 weeks</option>
+                <option :value="3">2-3 weeks</option>
+                <option :value="4">3+ weeks</option>
+              </select>
+            </div>
+          </fieldset>
+        </section>
+
         <!-- Pricing Section - Only show if user selected reader roles -->
         <section v-if="isReaderRole" class="form-section">
           <fieldset class="pricing-fieldset">
