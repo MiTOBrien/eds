@@ -291,28 +291,31 @@ onMounted(async () => {
         </section>
 
         <!-- Payment Options Section -->
-        <section>
-          <div class="form-group">
-            <label>Preferred Payment Methods:</label>
-            <div class="checkbox-group">
-              <label>
-                <input type="checkbox" value="paypal" v-model="userStore.payment_options" />
-                PayPal
-              </label>
-              <label>
-                <input type="checkbox" value="venmo" v-model="userStore.payment_options" />
-                Venmo
-              </label>
-              <label>
-                <input type="checkbox" value="zelle" v-model="userStore.payment_options" />
-                Zelle
-              </label>
-              <label>
-                <input type="checkbox" value="cashapp" v-model="userStore.payment_options" />
-                Cash App
-              </label>
+        <section v-if="isReaderRole" class="form-section">
+          <fieldset class="payment-fieldset">
+            <legend>Payment Options:</legend>
+            <div class="form-group">
+              <label>Preferred Payment Methods:</label>
+              <div class="checkbox-group">
+                <label>
+                  <input type="checkbox" value="paypal" v-model="userStore.payment_options" />
+                  PayPal
+                </label>
+                <label>
+                  <input type="checkbox" value="venmo" v-model="userStore.payment_options" />
+                  Venmo
+                </label>
+                <label>
+                  <input type="checkbox" value="zelle" v-model="userStore.payment_options" />
+                  Zelle
+                </label>
+                <label>
+                  <input type="checkbox" value="cashapp" v-model="userStore.payment_options" />
+                  Cash App
+                </label>
+              </div>
             </div>
-          </div>
+          </fieldset>
         </section>
 
         <!-- Genres Section - Only show if user selected reader roles -->
