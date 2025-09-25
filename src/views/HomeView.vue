@@ -288,8 +288,8 @@ watchEffect(() => {
           </div>
 
           <!-- Payment Options -->
-          <div v-if="Array.isArray(reader.payment_options) && reader.payment_options.length">
-            <strong>Preferred Payment:</strong>
+          <div v-if="Array.isArray(reader.payment_options) && reader.payment_options.length" class="payment-display">
+            <strong>Preferred Payment Methods:</strong>
             <ul>
               <li v-for="method in reader.payment_options" :key="method">{{ method }}</li>
             </ul>
@@ -356,9 +356,6 @@ watchEffect(() => {
     <div v-else class="no-results">
       <p>No readers found matching your criteria.</p>
       <button @click="clearFilters" class="clear-filters-btn">Clear Filters</button>
-    </div>
-    <div>
-      <button @click="fetchReaders">Test Fetch</button>
     </div>
   </main>
 </template>
@@ -572,14 +569,15 @@ watchEffect(() => {
   text-decoration: underline;
 }
 
-.pricing-display {
+.pricing-display, .payment-display {
   margin: 0.5rem 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #333;
 }
 
 .pricing-display strong {
   display: block;
+  font-size: .95rem;
   margin-bottom: 0.25rem;
 }
 
@@ -604,7 +602,7 @@ watchEffect(() => {
   display: block;
   margin-bottom: 0.5rem;
   color: #333;
-  font-size: 0.95rem;
+  font-size: .95rem;
 }
 
 .genre-tags {
