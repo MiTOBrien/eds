@@ -40,7 +40,8 @@
 .roles-fieldset,
 .genres-fieldset,
 .pricing-fieldset,
-.payment-fieldset {
+.payment-fieldset,
+.turnaround-fieldset {
   border: 2px solid #ddd;
   border-radius: 8px;
   padding: 1.5rem;
@@ -53,7 +54,8 @@
 .roles-fieldset legend,
 .genres-fieldset legend,
 .pricing-fieldset legend,
-.payment-fieldset legend {
+.payment-fieldset legend,
+.turnaround-fieldset legend {
   font-weight: 600;
   color: #555;
   padding: 0 1rem;
