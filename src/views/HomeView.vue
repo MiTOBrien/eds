@@ -22,21 +22,6 @@ const roleNameToId = {
   'Proof Reader': 5,
 }
 
-// const roleIdToName = {
-//   2: 'Author',
-//   3: 'Arc Reader',
-//   4: 'Beta Reader',
-//   5: 'Proof Reader',
-// }
-
-const turnaroundIdToName = {
-  0: 'Not specified',
-  1: 'Less than 1 week',
-  2: '1-2 weeks',
-  3: '2-3 weeks',
-  4: '3+ weeks',
-}
-
 const fetchReaders = async () => {
   console.log('Fetching readers...')
   try {

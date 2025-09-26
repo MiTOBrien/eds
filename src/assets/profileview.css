@@ -36,6 +36,12 @@
   width: 100%;
 }
 
+.profile-field.checkbox-field {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .info-fieldset,
 .roles-fieldset,
 .genres-fieldset,
