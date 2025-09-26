@@ -20,6 +20,7 @@ export const useUserStore = defineStore('user', () => {
   const isLoggedIn = ref(false)
   const shouldRefreshReaders = ref(false)
   const charges_for_services = ref(false)
+  const turnaround_time_label = ref(0)
   const pricingTiers = ref([])
   const payment_options = ref([])  
   const disabled = ref(false)
@@ -43,6 +44,7 @@ export const useUserStore = defineStore('user', () => {
       : []
     userGenres.value = Array.isArray(userData.genres) ? userData.genres : []
     charges_for_services.value = !!userData.charges_for_services
+    turnaround_time_label.value = userData.turnaround_time_label || 0
     pricingTiers.value = Array.isArray(userData.pricing_tiers) ? userData.pricing_tiers : []
     payment_options.value = Array.isArray(userData.payment_options) ? userData.payment_options : []
     disabled.value = !!userData.disabled
@@ -84,6 +86,7 @@ export const useUserStore = defineStore('user', () => {
     roles.value = []
     userGenres.value = []
     charges_for_services.value = false
+    turnaround_time_label.value = 0
     pricingTiers.value = []
     payment_options.value = []
     disabled.value = false
@@ -128,6 +131,7 @@ export const useUserStore = defineStore('user', () => {
     isLoggedIn,
     shouldRefreshReaders,
     charges_for_services,
+    turnaround_time_label,
     pricingTiers,
     disabled,
     payment_options,

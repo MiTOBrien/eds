@@ -106,6 +106,7 @@ const handleSubmit = async (event) => {
           last_name: userStore.last_name,
           role_ids: selectedRoles.value,
           charges_for_services: chargesForServices.value,
+          turnaround_time: userStore.turnaround_time,
           pricing_tiers_attributes: chargesForServices.value
             ? pricingTiers.value.map((tier) => ({
                 word_count: tier.wordCount,
@@ -263,6 +264,7 @@ onMounted(async () => {
             <div class="form-group">
               <label for="turnaround-time">Timefraome:</label>
               <select id="turnaround-time" v-model="userStore.turnaround_time">
+                <option :value="0">Not specified</option>
                 <option :value="1">Less than 1 week</option>
                 <option :value="2">1-2 weeks</option>
                 <option :value="3">2-3 weeks</option>
