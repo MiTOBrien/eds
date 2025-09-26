@@ -79,7 +79,7 @@ const login = async () => {
             type="email"
             id="email"
             name="email"
-            placeholder="Enter your email address"
+            placeholder="Enter a valid email address where you can be contacted"
             required
             :disabled="isLoading"
           />

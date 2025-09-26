@@ -223,6 +223,16 @@ onMounted(async () => {
                   placeholder="Last name"
                 />
               </div>
+
+              <div class="profile-field checkbox-field">
+                <label for="hide-name">Hide name on reader page:</label>
+                <input
+                type="checkbox"
+                v-model="userStore.hide_name"
+                id="hide-name"
+                name="hide-name"
+                />
+              </div>
             </div>
           </fieldset>
         </section>
