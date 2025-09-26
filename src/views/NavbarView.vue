@@ -49,6 +49,11 @@ const changePassword = () => {
   router.push('/change-password')
 }
 
+const faq = () => {
+  closeDropdown()
+  router.push('/faq')
+} 
+
 // Close dropdown when clicking outside
 const handleClickOutside = (event) => {
   if (!event.target.closest('.user-dropdown')) {
@@ -86,6 +91,7 @@ onUnmounted(() => {
 
           <div class="dropdown-menu" :class="{ show: isDropdownOpen }">
             <button class="dropdown-item" @click="changePassword">Change Password</button>
+            <button class="dropdown-item" @click="faq">FAQ</button>
             <button class="dropdown-item" @click="logout">Logout</button>
           </div>
         </div>
