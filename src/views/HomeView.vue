@@ -252,7 +252,7 @@ watchEffect(() => {
 
         <!-- Reader Info -->
         <div class="reader-info">
-          <h3 class="reader-name">{{ reader.first_name }} {{ reader.last_name }}</h3>
+          <h3 class="reader-name">{{ reader.hide_name ? 'Name hidden by reader' : `${reader.first_name} ${reader.last_name}` }}</h3>
           <p class="reader-username"><strong>Username:</strong> {{ reader.username }}</p>
           <p class="reader-roles">{{ getReaderRoles(reader.roles) }}</p>
           <p class="service-type" :class="{ 'paid-service': reader.charges_for_services }">

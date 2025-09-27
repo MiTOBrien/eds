@@ -104,6 +104,7 @@ const handleSubmit = async (event) => {
           username: userStore.username,
           first_name: userStore.first_name,
           last_name: userStore.last_name,
+          hide_name: userStore.hide_name,
           role_ids: selectedRoles.value,
           charges_for_services: chargesForServices.value,
           turnaround_time: userStore.turnaround_time,
@@ -225,12 +226,12 @@ onMounted(async () => {
               </div>
 
               <div class="profile-field checkbox-field">
-                <label for="hide-name">Hide name on reader page:</label>
+                <label for="hide-name">Hide real name on reader page:</label>
                 <input
-                type="checkbox"
-                v-model="userStore.hide_name"
-                id="hide-name"
-                name="hide-name"
+                  type="checkbox"
+                  v-model="userStore.hide_name"
+                  id="hide-name"
+                  name="hide-name"
                 />
               </div>
             </div>
@@ -272,7 +273,7 @@ onMounted(async () => {
           <fieldset class="turnaround-fieldset">
             <legend>Estimated Turnaround Time:</legend>
             <div class="form-group">
-              <label for="turnaround-time">Timefraome:</label>
+              <label for="turnaround-time">Timeframe:</label>
               <select id="turnaround-time" v-model="userStore.turnaround_time">
                 <option :value="0">Not specified</option>
                 <option :value="1">Less than 1 week</option>
