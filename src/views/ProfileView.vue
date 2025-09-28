@@ -110,6 +110,7 @@ const handleSubmit = async (event) => {
           turnaround_time: userStore.turnaround_time,
           pricing_tiers_attributes: chargesForServices.value
             ? pricingTiers.value.map((tier) => ({
+                id: tier.id,
                 word_count: tier.wordCount,
                 price_cents: Math.round(tier.price * 100),
                 currency: 'USD',
