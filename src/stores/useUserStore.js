@@ -23,7 +23,7 @@ export const useUserStore = defineStore('user', () => {
   const charges_for_services = ref(false)
   const turnaround_time_label = ref(0)
   const pricingTiers = ref([])
-  const payment_options = ref([])  
+  const payment_options = ref([])
   const disabled = ref(false)
 
   // Actions
@@ -47,7 +47,14 @@ export const useUserStore = defineStore('user', () => {
     userGenres.value = Array.isArray(userData.genres) ? userData.genres : []
     charges_for_services.value = !!userData.charges_for_services
     turnaround_time_label.value = userData.turnaround_time_label || 0
-    pricingTiers.value = Array.isArray(userData.pricing_tiers) ? userData.pricing_tiers : []
+    pricingTiers.value = Array.isArray(userData.pricing_tiers)
+      ? userData.pricing_tiers.map((tier) => ({
+          id: tier.id,
+          wordCount: tier.word_count,
+          price: tier.price_cents / 100,
+          currency: tier.currency,
+        }))
+      : []
     payment_options.value = Array.isArray(userData.payment_options) ? userData.payment_options : []
     disabled.value = !!userData.disabled
     isLoggedIn.value = true
@@ -105,6 +112,16 @@ export const useUserStore = defineStore('user', () => {
 
       if (userData.token) {
         token.value = userData.token
+      }
+
+      // ✅ Transform pricing tiers before login
+      if (Array.isArray(userData.pricing_tiers)) {
+        userData.pricing_tiers = userData.pricing_tiers.map((tier) => ({
+          id: tier.id,
+          wordCount: tier.word_count,
+          price: tier.price_cents / 100,
+          currency: tier.currency,
+        }))
       }
 
       login(userData)

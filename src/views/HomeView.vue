@@ -252,7 +252,13 @@ watchEffect(() => {
 
         <!-- Reader Info -->
         <div class="reader-info">
-          <h3 class="reader-name">{{ reader.hide_name ? 'Name hidden by reader' : `${reader.first_name} ${reader.last_name}` }}</h3>
+          <h3 :class="['reader-name', { hidden: reader.hide_name }]">
+            {{
+              reader.hide_name
+                ? 'Name hidden by reader'
+                : `${reader.first_name} ${reader.last_name}`
+            }}
+          </h3>
           <p class="reader-username"><strong>Username:</strong> {{ reader.username }}</p>
           <p class="reader-roles">{{ getReaderRoles(reader.roles) }}</p>
           <p class="service-type" :class="{ 'paid-service': reader.charges_for_services }">
@@ -286,7 +292,10 @@ watchEffect(() => {
           </div>
 
           <!-- Payment Options -->
-          <div v-if="Array.isArray(reader.payment_options) && reader.payment_options.length" class="payment-display">
+          <div
+            v-if="Array.isArray(reader.payment_options) && reader.payment_options.length"
+            class="payment-display"
+          >
             <strong>Preferred Payment Methods:</strong>
             <ul>
               <li v-for="method in reader.payment_options" :key="method">{{ method }}</li>
@@ -525,6 +534,11 @@ watchEffect(() => {
   font-size: 1.2rem;
 }
 
+.reader-name.hidden {
+  font-style: italic;
+  color: #777;
+}
+
 .reader-username {
   margin: 0 0 0.5rem 0;
   color: #666;
@@ -567,7 +581,8 @@ watchEffect(() => {
   text-decoration: underline;
 }
 
-.pricing-display, .payment-display {
+.pricing-display,
+.payment-display {
   margin: 0.5rem 0;
   font-size: 0.95rem;
   color: #333;
@@ -575,7 +590,7 @@ watchEffect(() => {
 
 .pricing-display strong {
   display: block;
-  font-size: .95rem;
+  font-size: 0.95rem;
   margin-bottom: 0.25rem;
 }
 
@@ -600,7 +615,7 @@ watchEffect(() => {
   display: block;
   margin-bottom: 0.5rem;
   color: #333;
-  font-size: .95rem;
+  font-size: 0.95rem;
 }
 
 .genre-tags {
