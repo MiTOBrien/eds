@@ -3,6 +3,7 @@ import { ref } from 'vue'
 
 export const useUserStore = defineStore('user', () => {
   // State
+  const user = ref(null)
   const token = ref(null)
   const id = ref(null)
   const username = ref('')
@@ -22,13 +23,14 @@ export const useUserStore = defineStore('user', () => {
   const shouldRefreshReaders = ref(false)
   const charges_for_services = ref(false)
   const turnaround_time_label = ref(0)
-  const pricingTiers = ref([])
+  const pricing_tiers = ref([])
   const payment_options = ref([])
   const disabled = ref(false)
 
   // Actions
   function login(userData) {
     token.value = userData.token
+    user.value = userData
     id.value = userData.id
     username.value = userData.username
     email.value = userData.email
@@ -47,13 +49,20 @@ export const useUserStore = defineStore('user', () => {
     userGenres.value = Array.isArray(userData.genres) ? userData.genres : []
     charges_for_services.value = !!userData.charges_for_services
     turnaround_time_label.value = userData.turnaround_time_label || 0
-    pricingTiers.value = Array.isArray(userData.pricing_tiers)
-      ? userData.pricing_tiers.map((tier) => ({
-          id: tier.id,
-          wordCount: tier.word_count,
-          price: tier.price_cents / 100,
-          currency: tier.currency,
-        }))
+    pricing_tiers.value = Array.isArray(userData.pricing_tiers)
+      ? userData.pricing_tiers.map((tier) => {
+          // Detect if already transformed
+          if ('wordCount' in tier && 'price' in tier) {
+            return tier
+          }
+          // Otherwise transform from raw backend keys
+          return {
+            id: tier.id,
+            wordCount: Number(tier.word_count),
+            price: Number(tier.price_cents) / 100,
+            currency: tier.currency ?? 'USD',
+          }
+        })
       : []
     payment_options.value = Array.isArray(userData.payment_options) ? userData.payment_options : []
     disabled.value = !!userData.disabled
@@ -65,7 +74,7 @@ export const useUserStore = defineStore('user', () => {
         ...userData,
         roles: roles.value,
         genres: userGenres.value,
-        pricing_tiers: pricingTiers.value,
+        pricing_tiers: pricing_tiers.value,
       }),
     )
   }
@@ -97,7 +106,7 @@ export const useUserStore = defineStore('user', () => {
     userGenres.value = []
     charges_for_services.value = false
     turnaround_time_label.value = 0
-    pricingTiers.value = []
+    pricing_tiers.value = []
     payment_options.value = []
     disabled.value = false
     isLoggedIn.value = false
@@ -109,21 +118,6 @@ export const useUserStore = defineStore('user', () => {
     const stored = localStorage.getItem('user')
     if (stored) {
       const userData = JSON.parse(stored)
-
-      if (userData.token) {
-        token.value = userData.token
-      }
-
-      // ✅ Transform pricing tiers before login
-      if (Array.isArray(userData.pricing_tiers)) {
-        userData.pricing_tiers = userData.pricing_tiers.map((tier) => ({
-          id: tier.id,
-          wordCount: tier.word_count,
-          price: tier.price_cents / 100,
-          currency: tier.currency,
-        }))
-      }
-
       login(userData)
     }
   }
@@ -134,6 +128,7 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     // State
+    user,
     token,
     id,
     username,
@@ -153,7 +148,7 @@ export const useUserStore = defineStore('user', () => {
     shouldRefreshReaders,
     charges_for_services,
     turnaround_time_label,
-    pricingTiers,
+    pricing_tiers,
     disabled,
     payment_options,
 

@@ -29,14 +29,7 @@ const initializeRoles = () => {
   }
 }
 
-const pricingTiers = ref(
-  Array.isArray(userStore.pricingTiers) && userStore.pricingTiers.length > 0
-    ? userStore.pricingTiers.map((tier) => ({
-        wordCount: tier.word_count,
-        price: tier.price_cents / 100,
-      }))
-    : [{ wordCount: 10000, price: 30 }],
-)
+const pricingTiers = ref(Array.isArray(userStore.pricing_tiers) ? [...userStore.pricing_tiers] : [])
 
 const initializeGenreSelections = () => {
   if (Array.isArray(userStore.userGenres)) {
@@ -304,12 +297,13 @@ onMounted(async () => {
               <div v-for="(tier, index) in pricingTiers" :key="index" class="pricing-tier">
                 <input
                   type="number"
-                  v-model.number="tier.wordCount"
+                  v-model.number="tier.word_count"
                   placeholder="Word count (e.g. 10000)"
                 />
                 <input
                   type="number"
-                  v-model.number="tier.price"
+                  :value="tier.price_cents / 100"
+                  @input="tier.price_cents = Math.round($event.target.value * 100)"
                   placeholder="Price in dollars (e.g. 30)"
                 />
                 <button type="button" @click="removeTier(index)">Remove</button>
