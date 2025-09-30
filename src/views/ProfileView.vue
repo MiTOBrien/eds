@@ -29,7 +29,7 @@ const initializeRoles = () => {
   }
 }
 
-const pricingTiers = ref(Array.isArray(userStore.pricing_tiers) ? [...userStore.pricing_tiers] : [])
+const pricingTiers = computed(() => userStore.pricing_tiers || [])
 
 const initializeGenreSelections = () => {
   if (Array.isArray(userStore.userGenres)) {
@@ -294,21 +294,29 @@ onMounted(async () => {
 
             <!-- Pricing Tiers -->
             <div v-if="chargesForServices" class="pricing-tiers">
-              <div v-for="(tier, index) in pricingTiers" :key="index" class="pricing-tier">
-                <input
-                  type="number"
-                  v-model.number="tier.word_count"
-                  placeholder="Word count (e.g. 10000)"
-                />
-                <input
-                  type="number"
-                  :value="tier.price_cents / 100"
-                  @input="tier.price_cents = Math.round($event.target.value * 100)"
-                  placeholder="Price in dollars (e.g. 30)"
-                />
-                <button type="button" @click="removeTier(index)">Remove</button>
+              <div
+                v-for="(tier, index) in pricingTiers"
+                :key="tier.id || index"
+                class="pricing-tier"
+              >
+                <div class="tier-row">
+                  <div class="tier-field">
+                    <label>Word Count</label>
+                    <input type="number" v-model.number="tier.wordCount" placeholder="e.g. 10000" />
+                  </div>
+
+                  <div class="tier-field">
+                    <label>Price (USD)</label>
+                    <input type="number" v-model.number="tier.price" placeholder="e.g. 30" />
+                  </div>
+
+                  <button type="button" class="remove-btn" @click="removeTier(index)">
+                    Remove
+                  </button>
+                </div>
               </div>
-              <button type="button" @click="addTier">Add Tier</button>
+
+              <button type="button" class="add-btn" @click="addTier">Add Tier</button>
             </div>
           </fieldset>
         </section>
@@ -436,4 +444,52 @@ onMounted(async () => {
   </main>
 </template>
 
-<style scoped></style>
+<style scoped>
+.pricing-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tier-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.tier-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 150px;
+}
+
+input[type="number"] {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.remove-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.add-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@media (min-width: 600px) {
+  .tier-row {
+    flex-wrap: nowrap;
+  }
+}
+</style>
