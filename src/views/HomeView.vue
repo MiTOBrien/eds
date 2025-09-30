@@ -154,7 +154,6 @@ const filteredReaders = computed(() => {
 onMounted(() => {
   if (token.value) {
     fetchReaders()
-    console.log('Readers:', readers.value)
     fetchGenres()
   }
 })
