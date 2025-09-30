@@ -70,7 +70,7 @@ const login = async () => {
   <main>
     <h1>Early Draft Society</h1>
     <h2>Building Better Books Together</h2>
-    <div class="login-form">
+    <div class="reset-password-form">
       <form @submit.prevent="login">
         <div class="form-group">
           <label for="email">Email address:</label>
@@ -79,35 +79,19 @@ const login = async () => {
             type="email"
             id="email"
             name="email"
-            placeholder="Enter a valid email address where you can be contacted"
+            placeholder="Enter your email address"
             required
             :disabled="isLoading"
           />
         </div>
 
-        <div class="form-group">
-          <label for="password">Password:</label>
-          <input
-            v-model="password"
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Enter your password"
-            required
-            :disabled="isLoading"
-          />
-        </div>
-
-        <button type="submit" class="submit-btn" :disabled="isLoading">
-          {{ isLoading ? 'Logging in...' : 'Login' }}
+        <button type="submit" class="submit-btn">
+          Reset Password
         </button>
       </form>
 
       <p class="forgot-password-link">
-        <RouterLink to="/forgot-password">Forgot your password?</RouterLink>
-      </p>
-      <p class="register-link">
-        Don't have an account? <RouterLink to="/register">Create one here</RouterLink>
+        <RouterLink to="/">Back to login page</RouterLink>
       </p>
     </div>
   </main>
@@ -124,7 +108,7 @@ main {
   justify-content: center;
 }
 
-.login-form {
+.reset-password-form {
   background: #f9f9f9;
   padding: 2rem;
   border-radius: 8px;
@@ -187,7 +171,7 @@ main {
     max-width: 100%;
   }
 
-  .login-form {
+  .reset-password-form {
     padding: 1.5rem;
   }
 }
