@@ -6,6 +6,7 @@ import NavbarView from './NavbarView.vue'
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
 
+const profileImageFile = ref(null)
 const availableGenres = ref([])
 const selectedGenres = ref([])
 const selectedSubGenres = reactive({})
@@ -86,6 +87,28 @@ const handleSubmit = async (event) => {
       new Set([...selectedGenres.value, ...Object.values(selectedSubGenres).flat()]),
     )
 
+    let uploadedImageUrl = null
+
+    if (profileImageFile.value) {
+      const formData = new FormData()
+      formData.append('image', profileImageFile.value)
+
+      const imageResponse = await fetch(`${API_BASE_URL}/profile-image`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${userStore.token}`,
+        },
+      })
+
+      if (!imageResponse.ok) {
+        throw new Error('Image upload failed')
+      }
+
+      const imageData = await imageResponse.json()
+      uploadedImageUrl = imageData.image_url
+    }
+
     const response = await fetch(`${API_BASE_URL}/users/${userStore.id}`, {
       method: 'PUT',
       headers: {
@@ -94,6 +117,7 @@ const handleSubmit = async (event) => {
       },
       body: JSON.stringify({
         user: {
+          avatar_url: uploadedImageUrl || userStore.avatar_url,
           username: userStore.username,
           first_name: userStore.first_name,
           last_name: userStore.last_name,
@@ -175,6 +199,15 @@ onMounted(async () => {
             <legend>Personal Information</legend>
 
             <div class="fields-grid">
+              <div class="profile-avatar">
+                <img
+                  :src="userStore.avatar_url || '/default-avatar.png'"
+                  alt="User Avatar"
+                  class="avatar-image"
+                />
+                <input type="file" @change="(e) => (profileImageFile.value = e.target.files[0])" />
+              </div>
+
               <div class="profile-field">
                 <label for="email">Email:</label>
                 <input
@@ -444,5 +477,4 @@ onMounted(async () => {
   </main>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
