@@ -6,7 +6,7 @@ import NavbarView from './NavbarView.vue'
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
 
-const profileImageFile = ref(null)
+const selectedProfileImage = ref(null)
 const availableGenres = ref([])
 const selectedGenres = ref([])
 const selectedSubGenres = reactive({})
@@ -31,6 +31,20 @@ const initializeRoles = () => {
 }
 
 const pricingTiers = computed(() => userStore.pricing_tiers || [])
+
+const previewUrl = computed(() =>
+  selectedProfileImage.value ? URL.createObjectURL(selectedProfileImage.value) : userStore.profile_picture
+)
+
+const handleFileChange = (e) => {
+  const file = e.target?.files?.[0]
+  console.log('File from input event:', file)
+  if (file) {
+    selectedProfileImage.value = file
+    console.log('File selected:', file)
+    console.log('Current selectedProfileImage:', selectedProfileImage.value)
+  }
+}
 
 const initializeGenreSelections = () => {
   if (Array.isArray(userStore.userGenres)) {
@@ -89,9 +103,9 @@ const handleSubmit = async (event) => {
 
     let uploadedImageUrl = null
 
-    if (profileImageFile.value) {
+    if (selectedProfileImage.value) {
       const formData = new FormData()
-      formData.append('image', profileImageFile.value)
+      formData.append('image', selectedProfileImage.value)
 
       const imageResponse = await fetch(`${API_BASE_URL}/profile-image`, {
         method: 'POST',
@@ -117,7 +131,7 @@ const handleSubmit = async (event) => {
       },
       body: JSON.stringify({
         user: {
-          avatar_url: uploadedImageUrl || userStore.avatar_url,
+          profile_picture: uploadedImageUrl || userStore.profile_picture,
           username: userStore.username,
           first_name: userStore.first_name,
           last_name: userStore.last_name,
@@ -168,6 +182,10 @@ watch(
   { immediate: true },
 )
 
+watch(selectedProfileImage, (newFile) => {
+  console.log('Selected file:', newFile)
+})
+
 onMounted(async () => {
   userStore.restoreFromLocalStorage()
 
@@ -201,11 +219,11 @@ onMounted(async () => {
             <div class="fields-grid">
               <div class="profile-avatar">
                 <img
-                  :src="userStore.avatar_url || '/default-avatar.png'"
+                  :src="userStore.profile_picture || 'public/icons8-user-default-64.png'"
                   alt="User Avatar"
                   class="avatar-image"
                 />
-                <input type="file" @change="(e) => (profileImageFile.value = e.target.files[0])" />
+                <input type="file" accept="image/*" @change="handleFileChange" />
               </div>
 
               <div class="profile-field">
