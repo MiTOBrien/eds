@@ -107,7 +107,7 @@ const handleSubmit = async (event) => {
       const formData = new FormData()
       formData.append('image', selectedProfileImage.value)
 
-      const imageResponse = await fetch(`${API_BASE_URL}/profile-image`, {
+      const imageResponse = await fetch(`${API_BASE_URL}/users/profile-image`, {
         method: 'POST',
         body: formData,
         headers: {
