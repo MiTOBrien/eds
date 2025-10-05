@@ -10,11 +10,11 @@ const isLoading = ref(false)
 const router = useRouter()
 const userStore = useUserStore()
 
-const login = async () => {
+const requestPasswordReset = async () => {
   isLoading.value = true
 
   try {
-    const response = await fetch(`${API_BASE_URL}/login`, {
+    const response = await fetch(`${API_BASE_URL}/users/forgot-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -23,43 +23,22 @@ const login = async () => {
       body: JSON.stringify({
         user: {
           email: email.value,
-          password: password.value,
         },
       }),
     })
 
     const result = await response.json()
 
-    const token = result.status?.token
-    const user = result.status?.data?.user
-
-    if (response.ok && token && user) {
-      // Combine token with user data
-      const fullUser = {
-        ...user,
-        token,
-        roles: Array.isArray(user.roles) ? user.roles : [],
-      }
-
-      // Store in Pinia and localStorage
-      userStore.setUser(fullUser)
-
-      router.push('/home')
+    if (response.ok) {
+      alert('Reset instructions sent to your email.')
+      router.push('/')
     } else {
-      const errorMessage =
-        result.error || result.status?.message || 'Login failed. Please try again.'
+      const errorMessage = result.error || 'Reset failed. Please try again.'
       alert(errorMessage)
     }
   } catch (error) {
-    console.error('Login error:', error)
-
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      alert(
-        `Cannot connect to backend at ${API_BASE_URL}. Please check if your backend server is running.`,
-      )
-    } else {
-      alert(`An error occurred during login: ${error.message}`)
-    }
+    console.error('Reset error:', error)
+    alert('Something went wrong. Please try again.')
   } finally {
     isLoading.value = false
   }
@@ -71,7 +50,7 @@ const login = async () => {
     <h1>Early Draft Society</h1>
     <h2>Building Better Books Together</h2>
     <div class="reset-password-form">
-      <form @submit.prevent="login">
+      <form @submit.prevent="requestPasswordReset">
         <div class="form-group">
           <label for="email">Email address:</label>
           <input
@@ -85,9 +64,7 @@ const login = async () => {
           />
         </div>
 
-        <button type="submit" class="submit-btn">
-          Reset Password
-        </button>
+        <button type="submit" class="submit-btn">Reset Password</button>
       </form>
 
       <p class="forgot-password-link">

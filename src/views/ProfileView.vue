@@ -182,10 +182,6 @@ watch(
   { immediate: true },
 )
 
-watch(selectedProfileImage, (newFile) => {
-  console.log('Selected file:', newFile)
-})
-
 onMounted(async () => {
   userStore.restoreFromLocalStorage()
 
