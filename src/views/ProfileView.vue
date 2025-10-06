@@ -491,4 +491,12 @@ onMounted(async () => {
   </main>
 </template>
 
-<style scoped></style>
+<style scoped>
+.avatar-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #f0f0f0;
+}
+</style>
