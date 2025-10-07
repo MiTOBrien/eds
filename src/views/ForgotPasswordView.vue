@@ -12,9 +12,9 @@ const userStore = useUserStore()
 
 const requestPasswordReset = async () => {
   isLoading.value = true
-
+  console.log('Requesting password reset for:', email.value)
   try {
-    const response = await fetch(`${API_BASE_URL}/users/forgot-password`, {
+    const response = await fetch(`${API_BASE_URL}/password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
