@@ -315,7 +315,7 @@ const register = async () => {
                   <label for="annual-plan" class="plan-label">
                     <div class="plan-details">
                       <h3>Annual Plan</h3>
-                      <p class="price">$100/year</p>
+                      <p class="price">$120/year</p>
                       <p class="plan-description">Save with annual billing</p>
                       <span class="savings-badge">Best Value</span>
                     </div>
