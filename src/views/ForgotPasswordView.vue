@@ -1,14 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
-import { useUserStore } from '@/stores/useUserStore'
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const email = ref('')
-const password = ref('')
 const isLoading = ref(false)
 const router = useRouter()
-const userStore = useUserStore()
 
 const requestPasswordReset = async () => {
   isLoading.value = true
