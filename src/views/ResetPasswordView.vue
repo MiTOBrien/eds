@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { PASSWORD_REGEX, isValidPassword } from '@/utils/passwordRules'
 
 const route = useRoute()
 const router = useRouter()
@@ -8,6 +9,9 @@ const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 
 const password = ref('')
 const passwordConfirmation = ref('')
+const isPasswordValid = computed(() => isValidPassword(password.value))
+const doPasswordsMatch = computed(() => password.value === passwordConfirmation.value)
+
 const token = route.query.reset_password_token
 
 const submitReset = async () => {
@@ -15,17 +19,17 @@ const submitReset = async () => {
     user: {
       reset_password_token: token,
       password: password.value,
-      password_confirmation: passwordConfirmation.value
-    }
+      password_confirmation: passwordConfirmation.value,
+    },
   }
 
   try {
     const response = await fetch(`${API_BASE_URL}/password`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
 
     if (!response.ok) throw new Error('Reset failed')
@@ -47,9 +51,14 @@ const submitReset = async () => {
     <hr />
     <h3>Reset Password</h3>
     <form @submit.prevent="submitReset">
+      <p v-if="!isPasswordValid" class="validation-message">
+        Password must be at least 8 characters and include uppercase, lowercase, and a number or
+        symbol.
+      </p>
       <input type="password" v-model="password" placeholder="New password" />
+      <p v-if="!doPasswordsMatch" class="validation-message">Passwords do not match.</p>
       <input type="password" v-model="passwordConfirmation" placeholder="Confirm password" />
-      <button type="submit">Reset Password</button>
+      <button type="submit" :disabled="!isPasswordValid || !doPasswordsMatch">Reset Password</button>
     </form>
   </div>
 </template>

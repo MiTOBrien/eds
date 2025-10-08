@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/useUserStore'
+import { PASSWORD_REGEX, isValidPassword } from '@/utils/passwordRules'
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const email = ref('')
@@ -10,7 +11,9 @@ const first_name = ref('')
 const last_name = ref('')
 const password = ref('')
 const confirmPassword = ref('')
-const selectedRoles = ref([]) // should now contain role_ids like [2, 3, 4]
+const isPasswordValid = computed(() => isValidPassword(password.value))
+const doPasswordsMatch = computed(() => password.value === confirmPassword.value)
+const selectedRoles = ref([])
 const chargesForServices = ref(false)
 const subscriptionPlan = ref('monthly') // 'monthly' 'quarterly' or 'annual'
 const freePlanAcknowledgment = ref(false)
@@ -154,6 +157,10 @@ const register = async () => {
         </div>
 
         <div class="form-group">
+          <p v-if="!isPasswordValid" class="validation-message">
+            Password must be at least 8 characters and include uppercase, lowercase, and a number or
+            symbol.
+          </p>
           <label for="password">Password:</label>
           <input
             v-model="password"
@@ -166,6 +173,7 @@ const register = async () => {
         </div>
 
         <div class="form-group">
+          <p v-if="!doPasswordsMatch" class="validation-message">Passwords do not match.</p>
           <label for="confirmpassword">Confirm Password:</label>
           <input
             v-model="confirmPassword"
@@ -331,7 +339,9 @@ const register = async () => {
           </fieldset>
         </div>
 
-        <button type="submit" class="submit-btn">Register</button>
+        <button type="submit" class="submit-btn" :disabled="!isPasswordValid || !doPasswordsMatch">
+          Register
+        </button>
       </form>
 
       <p class="back-link">
