@@ -115,11 +115,6 @@ main {
   border-color: #007bff;
 }
 
-.form-group input:disabled {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-}
-
 .submit-btn {
   width: 100%;
   padding: 0.75rem;
@@ -132,10 +127,9 @@ main {
   margin-top: 1rem;
 }
 
-.register-link {
+.forgot-password-link {
   text-align: center;
-  margin-top: 1.5rem;
-  color: #666;
+  margin-top: 1rem;
 }
 
 /* Responsive design */

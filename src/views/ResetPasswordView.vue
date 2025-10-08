@@ -32,7 +32,7 @@ const submitReset = async () => {
 
     const data = await response.json()
     console.log('Success:', data)
-    router.push('/login') // or show a success message
+    router.push('/') // or show a success message
   } catch (err) {
     console.error('Error:', err)
     // Show error to user
