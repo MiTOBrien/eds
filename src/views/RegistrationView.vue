@@ -3,7 +3,6 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/useUserStore'
 import { PASSWORD_REGEX, isValidPassword } from '@/utils/passwordRules'
-import { loadStripe } from '@stripe/stripe-js';
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const email = ref('')
@@ -12,50 +11,21 @@ const first_name = ref('')
 const last_name = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const selectedRoles = ref([])
+
 const isPasswordValid = computed(() => isValidPassword(password.value))
 const doPasswordsMatch = computed(() => password.value === confirmPassword.value)
-const selectedRoles = ref([])
-const chargesForServices = ref(false)
-const subscriptionPlan = ref('monthly') // 'monthly' 'quarterly' or 'annual'
-const freePlanAcknowledgment = ref(false)
+
 const router = useRouter()
 const userStore = useUserStore()
 
-// Computed property to determine if user needs paid subscription
-const needsPaidSubscription = computed(() => {
-  const paidRoleIds = [3, 4, 5]
-  const hasPaidRole = selectedRoles.value.some((id) => paidRoleIds.includes(id))
-  return hasPaidRole && chargesForServices.value === true
-})
-
-// Computed property to determine subscription type
-const subscriptionType = computed(() => {
-  if (!needsPaidSubscription.value) return 'free'
-  switch (subscriptionPlan.value) {
-    case 'quarterly':
-      return 'paid_quarterly'
-    case 'annual':
-      return 'paid_annual'
-    default:
-      return 'paid_monthly'
-  }
-})
-
-// Computed property for subscription price display
-const subscriptionPrice = computed(() => {
-  if (!needsPaidSubscription.value) return 'Free'
-  switch (subscriptionPlan.value) {
-    case 'quarterly':
-      return '$12.50/month (billed quarterly)'
-    case 'annual':
-      return '$10.00/month (billed annually)'
-    default:
-      return '$15.00/month'
-  }
-})
-
 const register = async () => {
-  if (password.value !== confirmPassword.value) {
+  if (!isPasswordValid.value) {
+    alert('Password does not meet complexity requirements')
+    return
+  }
+
+  if (!doPasswordsMatch.value) {
     alert('Passwords do not match')
     return
   }
@@ -65,13 +35,7 @@ const register = async () => {
     return
   }
 
-  if (!needsPaidSubscription.value && !freePlanAcknowledgment.value) {
-    alert('Please acknowledge the free plan terms')
-    return
-  }
-
   try {
-    // Step 1: Register the user
     const response = await fetch(`${API_BASE_URL}/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -83,53 +47,18 @@ const register = async () => {
           last_name: last_name.value,
           password: password.value,
           role_ids: selectedRoles.value,
-          subscription_type: subscriptionType.value,
-          charges_for_services: chargesForServices.value,
         },
       }),
     })
 
     const data = await response.json()
 
-    if (!response.ok) {
-      alert(data.error || 'Registration failed')
-      return
-    }
-
-    // Step 2: If free plan, show success and redirect
-    if (!needsPaidSubscription.value) {
+    if (response.ok) {
       alert('Registration successful! Please login.')
       router.push('/')
-      return
+    } else {
+      alert(data.error || 'Registration failed')
     }
-
-    // Step 3: Trigger Stripe Checkout for paid tiers
-    try {
-      const checkoutRes = await fetch(`${API_BASE_URL}/payments/create_checkout_session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier: subscriptionPlan.value })
-      })
-
-      const checkoutData = await checkoutRes.json()
-
-      if (!checkoutRes.ok || !checkoutData.id) {
-        alert('Unable to start payment process. Please try again.')
-        return
-      }
-
-      const stripe = await loadStripe('pk_test_...')
-      const { error } = await stripe.redirectToCheckout({ sessionId: checkoutData.id })
-
-      if (error) {
-        console.error('Stripe redirect error:', error.message)
-        alert('Payment redirect failed. Please try again.')
-      }
-    } catch (err) {
-      console.error('Stripe checkout session error:', err)
-      alert('Unable to start payment process.')
-    }
-
   } catch (error) {
     console.error(error)
     alert('An error occurred during registration')
@@ -193,8 +122,7 @@ const register = async () => {
 
         <div class="form-group">
           <p v-if="!isPasswordValid" class="validation-message">
-            Password must be at least 8 characters and include uppercase, lowercase, and a number or
-            symbol.
+            Password must be at least 8 characters and include uppercase, lowercase, and a number or symbol.
           </p>
           <label for="password">Password:</label>
           <input
@@ -243,133 +171,6 @@ const register = async () => {
                 <input type="checkbox" id="proofreader" :value="5" v-model="selectedRoles" />
                 <label for="proofreader">Proof Reader</label>
               </div>
-            </div>
-          </fieldset>
-        </div>
-
-        <!-- Service Pricing Question -->
-        <div
-          class="form-group"
-          v-if="
-            needsPaidSubscription || selectedRoles.some((role) => [3, 4, 5].includes(Number(role)))
-          "
-        >
-          <fieldset class="service-pricing-fieldset">
-            <legend>Do you charge authors for your services?</legend>
-            <div class="pricing-options">
-              <div class="pricing-option">
-                <input
-                  type="radio"
-                  id="free-services"
-                  :value="false"
-                  v-model="chargesForServices"
-                  @change="chargesForServices = false"
-                />
-                <label for="free-services">No, I provide free services</label>
-              </div>
-              <div class="pricing-option">
-                <input
-                  type="radio"
-                  id="paid-services"
-                  :value="true"
-                  v-model="chargesForServices"
-                  @change="chargesForServices = true"
-                />
-                <label for="paid-services">Yes, I charge a fee for my services</label>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-
-        <!-- Subscription Section -->
-        <div class="form-group">
-          <fieldset class="subscription-fieldset">
-            <legend>Subscription Plan:</legend>
-
-            <!-- Free Account Display -->
-            <div v-if="!needsPaidSubscription" class="subscription-info free-plan">
-              <div class="plan-details">
-                <h3>Free Account</h3>
-                <p class="price">$0/month</p>
-                <p class="plan-description">
-                  For authors and readers who provide free services to the community.
-                </p>
-              </div>
-
-              <!-- Free Plan Acknowledgment -->
-              <div class="acknowledgment-wrapper">
-                <div class="checkbox-wrapper">
-                  <input
-                    type="checkbox"
-                    id="free-plan-acknowledgment"
-                    v-model="freePlanAcknowledgment"
-                    required
-                  />
-                  <label for="free-plan-acknowledgment">
-                    I acknowledge that if I register as a non-professional and am reported for
-                    requesting payment, my account will be deleted.
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- Paid Account Options -->
-            <div v-else class="subscription-options">
-              <p class="subscription-note">
-                Since you charge for your services, a paid subscription is required to access our
-                platform.
-              </p>
-
-              <div class="plan-options">
-                <div class="plan-option" :class="{ active: subscriptionPlan === 'monthly' }">
-                  <input
-                    type="radio"
-                    id="monthly-plan"
-                    value="monthly"
-                    v-model="subscriptionPlan"
-                  />
-                  <label for="monthly-plan" class="plan-label">
-                    <div class="plan-details">
-                      <h3>Monthly Plan</h3>
-                      <p class="price">$15/month</p>
-                      <p class="plan-description">Flexible monthly billing</p>
-                    </div>
-                  </label>
-                </div>
-
-                <div class="plan-option" :class="{ active: subscriptionPlan === 'quarterly' }">
-                  <input
-                    type="radio"
-                    id="quarterly-plan"
-                    value="quarterly"
-                    v-model="subscriptionPlan"
-                  />
-                  <label for="quarterly-plan" class="plan-label">
-                    <div class="plan-details">
-                      <h3>Quarterly Plan</h3>
-                      <p class="price">$12.50/month</p>
-                      <p class="plan-description">Billed every 3 months ($37.50)</p>
-                    </div>
-                  </label>
-                </div>
-
-                <div class="plan-option" :class="{ active: subscriptionPlan === 'annual' }">
-                  <input type="radio" id="annual-plan" value="annual" v-model="subscriptionPlan" />
-                  <label for="annual-plan" class="plan-label">
-                    <div class="plan-details">
-                      <h3>Annual Plan</h3>
-                      <p class="price">$120/year</p>
-                      <p class="plan-description">Save with annual billing</p>
-                      <span class="savings-badge">Best Value</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- Current Selection Summary -->
-            <div class="subscription-summary">
-              <p><strong>Selected Plan:</strong> {{ subscriptionPrice }}</p>
             </div>
           </fieldset>
         </div>
