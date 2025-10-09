@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/useUserStore'
 import { PASSWORD_REGEX, isValidPassword } from '@/utils/passwordRules'
+import { loadStripe } from '@stripe/stripe-js';
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const email = ref('')
@@ -70,6 +71,7 @@ const register = async () => {
   }
 
   try {
+    // Step 1: Register the user
     const response = await fetch(`${API_BASE_URL}/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -89,12 +91,45 @@ const register = async () => {
 
     const data = await response.json()
 
-    if (response.ok) {
+    if (!response.ok) {
+      alert(data.error || 'Registration failed')
+      return
+    }
+
+    // Step 2: If free plan, show success and redirect
+    if (!needsPaidSubscription.value) {
       alert('Registration successful! Please login.')
       router.push('/')
-    } else {
-      alert(data.error || 'Registration failed')
+      return
     }
+
+    // Step 3: Trigger Stripe Checkout for paid tiers
+    try {
+      const checkoutRes = await fetch(`${API_BASE_URL}/payments/create_checkout_session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier: subscriptionPlan.value })
+      })
+
+      const checkoutData = await checkoutRes.json()
+
+      if (!checkoutRes.ok || !checkoutData.id) {
+        alert('Unable to start payment process. Please try again.')
+        return
+      }
+
+      const stripe = await loadStripe('pk_test_...')
+      const { error } = await stripe.redirectToCheckout({ sessionId: checkoutData.id })
+
+      if (error) {
+        console.error('Stripe redirect error:', error.message)
+        alert('Payment redirect failed. Please try again.')
+      }
+    } catch (err) {
+      console.error('Stripe checkout session error:', err)
+      alert('Unable to start payment process.')
+    }
+
   } catch (error) {
     console.error(error)
     alert('An error occurred during registration')
