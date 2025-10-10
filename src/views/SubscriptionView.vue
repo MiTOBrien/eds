@@ -1,18 +1,20 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useUserStore } from '@/stores/useUserStore'
 import { loadStripe } from '@stripe/stripe-js'
 import NavbarView from './NavbarView.vue'
 
-const selectedPlan = ref(null)
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
+const userStore = useUserStore()
+const selectedPlan = ref(null)
+const token = computed(() => userStore.token)
 
 const startCheckout = async (tier) => {
   selectedPlan.value = tier
   try {
     const response = await fetch(`${API_BASE_URL}/payments/create_checkout_session`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userStore.token}` },
       body: JSON.stringify({ tier }),
     })
 
