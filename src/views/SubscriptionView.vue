@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useUserStore } from '@/stores/useUserStore'
 import { loadStripe } from '@stripe/stripe-js'
 import NavbarView from './NavbarView.vue'
