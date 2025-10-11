@@ -35,6 +35,11 @@ const router = createRouter({
       component: () => import('../views/SubscriptionView.vue'),
     },
     {
+      path: '/success',
+      name: 'success',
+      component: () => import('../views/SuccessView.vue'),
+    },
+    {
       path: '/change-password',
       name: 'change-password',
       component: () => import('../views/ChangePasswordView.vue'),
@@ -58,7 +63,6 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       component: () => import('../views/AdminView.vue'),
-      // meta: { requiresAuth: true, requiresAdmin: true },
     },
   ],
 })
