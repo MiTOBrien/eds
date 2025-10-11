@@ -9,12 +9,6 @@ const userStore = useUserStore()
 const selectedPlan = ref(null)
 const token = computed(() => userStore.token)
 
-const publishableKey = import.meta.env.DEV
-  ? import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY_TEST
-  : import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY_LIVE
-
-const stripe = await loadStripe(publishableKey)
-
 const startCheckout = async (tier) => {
   selectedPlan.value = tier
   try {
@@ -29,17 +23,12 @@ const startCheckout = async (tier) => {
 
     const data = await response.json()
 
-    if (!response.ok || !data.id) {
+    if (!response.ok || !data.url) {
       alert('Unable to start payment process. Please try again.')
       return
     }
 
-    const { error } = await stripe.redirectToCheckout({ sessionId: data.id })
-
-    if (error) {
-      console.error('Stripe redirect error:', error.message)
-      alert('Payment redirect failed. Please try again.')
-    }
+    window.location.href = data.url
   } catch (err) {
     console.error('Stripe checkout session error:', err)
     alert('Unable to start payment process.')
