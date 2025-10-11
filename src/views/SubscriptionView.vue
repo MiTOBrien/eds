@@ -9,12 +9,21 @@ const userStore = useUserStore()
 const selectedPlan = ref(null)
 const token = computed(() => userStore.token)
 
+const publishableKey = import.meta.env.DEV
+  ? import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY_TEST
+  : import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY_LIVE
+
+const stripe = await loadStripe(publishableKey)
+
 const startCheckout = async (tier) => {
   selectedPlan.value = tier
   try {
     const response = await fetch(`${API_BASE_URL}/payments/create_checkout_session`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userStore.token}` },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userStore.token}`,
+      },
       body: JSON.stringify({ tier }),
     })
 
@@ -25,7 +34,6 @@ const startCheckout = async (tier) => {
       return
     }
 
-    const stripe = await loadStripe('pk_test_...')
     const { error } = await stripe.redirectToCheckout({ sessionId: data.id })
 
     if (error) {
@@ -46,8 +54,11 @@ const startCheckout = async (tier) => {
       <hr />
       <h3>Upgrade Your Account</h3>
     </div>
-    <p>Select a subscription plan to unlock premium features if you want to charge authors for your services. <br /><strong>Note:</strong> If you are reported for requesting payment without a paid subscription plan your account will be removed.</p>
-    
+    <p>
+      Select a subscription plan to unlock premium features if you want to charge authors for your
+      services. <br /><strong>Note:</strong> If you are reported for requesting payment without a
+      paid subscription plan your account will be removed.
+    </p>
 
     <div class="plan-options">
       <div class="plan-card" :class="{ active: selectedPlan === 'monthly' }">
