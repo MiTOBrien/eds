@@ -12,6 +12,7 @@ const last_name = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const selectedRoles = ref([])
+const acceptedTOS = ref(false)
 
 const isPasswordValid = computed(() => isValidPassword(password.value))
 const doPasswordsMatch = computed(() => password.value === confirmPassword.value)
@@ -32,6 +33,11 @@ const register = async () => {
 
   if (selectedRoles.value.length === 0) {
     alert('Please select at least one role')
+    return
+  }
+
+  if (!acceptedTOS.value) {
+    alert('You must acknowledge the Terms of Service to register.')
     return
   }
 
@@ -122,7 +128,8 @@ const register = async () => {
 
         <div class="form-group">
           <p v-if="!isPasswordValid" class="validation-message">
-            Password must be at least 8 characters and include uppercase, lowercase, and a number or symbol.
+            Password must be at least 8 characters and include uppercase, lowercase, and a number or
+            symbol.
           </p>
           <label for="password">Password:</label>
           <input
@@ -173,6 +180,14 @@ const register = async () => {
               </div>
             </div>
           </fieldset>
+        </div>
+
+        <div class="form-group">
+          <label>
+            <input type="checkbox" v-model="acceptedTOS" />
+            I acknowledge and agree to the
+            <router-link to="/terms-of-service" target="_blank">Terms of Service</router-link>.
+          </label>
         </div>
 
         <button type="submit" class="submit-btn" :disabled="!isPasswordValid || !doPasswordsMatch">

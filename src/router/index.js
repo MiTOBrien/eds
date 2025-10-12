@@ -65,6 +65,16 @@ const router = createRouter({
       component: () => import('../views/FaqView.vue'),
     },
     {
+      path: '/terms-of-service',
+      name: 'terms-of-service',
+      component: () => import('../views/TermsOfService.vue'),
+    },
+    {
+      path: '/privacy-policy',
+      name: 'privacy-policy',
+      component: () => import('../views/PrivacyPolicyView.vue'),
+    },
+    {
       path: '/admin',
       name: 'admin',
       component: () => import('../views/AdminView.vue'),
