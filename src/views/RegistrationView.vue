@@ -53,6 +53,7 @@ const register = async () => {
           last_name: last_name.value,
           password: password.value,
           role_ids: selectedRoles.value,
+          tos_accepted: acceptedTOS.value,
         },
       }),
     })

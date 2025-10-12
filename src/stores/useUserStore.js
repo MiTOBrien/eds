@@ -11,7 +11,6 @@ export const useUserStore = defineStore('user', () => {
   const first_name = ref('')
   const last_name = ref('')
   const hide_name = ref(false)
-  const professional = ref(false)
   const bio = ref('')
   const profile_picture = ref('')
   const facebook_handle = ref('')
@@ -21,7 +20,6 @@ export const useUserStore = defineStore('user', () => {
   const userGenres = ref([])
   const isLoggedIn = ref(false)
   const shouldRefreshReaders = ref(false)
-  const charges_for_services = ref(false)
   const turnaround_time_label = ref(0)
   const pricing_tiers = ref([])
   const payment_options = ref([])
@@ -37,7 +35,6 @@ export const useUserStore = defineStore('user', () => {
     first_name.value = userData.first_name
     last_name.value = userData.last_name
     hide_name.value = userData.hide_name || false
-    professional.value = userData.professional || false
     bio.value = userData.bio || ''
     profile_picture.value = userData.profile_picture || ''
     facebook_handle.value = userData.facebook || ''
@@ -47,7 +44,6 @@ export const useUserStore = defineStore('user', () => {
       ? userData.roles.map((role) => (typeof role === 'object' ? role.id : role))
       : []
     userGenres.value = Array.isArray(userData.genres) ? userData.genres : []
-    charges_for_services.value = !!userData.charges_for_services
     turnaround_time_label.value = userData.turnaround_time_label || 0
     pricing_tiers.value = Array.isArray(userData.pricing_tiers)
       ? userData.pricing_tiers.map((tier) => {
@@ -96,7 +92,6 @@ export const useUserStore = defineStore('user', () => {
     first_name.value = ''
     last_name.value = ''
     hide_name.value = false
-    professional.value = false
     bio.value = ''
     profile_picture.value = ''
     facebook_handle.value = ''
@@ -104,7 +99,6 @@ export const useUserStore = defineStore('user', () => {
     x_handle.value = ''
     roles.value = []
     userGenres.value = []
-    charges_for_services.value = false
     turnaround_time_label.value = 0
     pricing_tiers.value = []
     payment_options.value = []
@@ -136,7 +130,6 @@ export const useUserStore = defineStore('user', () => {
     first_name,
     last_name,
     hide_name,
-    professional,
     bio,
     profile_picture,
     facebook_handle,
@@ -146,7 +139,6 @@ export const useUserStore = defineStore('user', () => {
     userGenres,
     isLoggedIn,
     shouldRefreshReaders,
-    charges_for_services,
     turnaround_time_label,
     pricing_tiers,
     disabled,
