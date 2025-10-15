@@ -12,8 +12,7 @@ const selectedGenres = ref([])
 const selectedSubGenres = reactive({})
 const selectedRoles = ref([])
 const updateStatus = ref('')
-
-const chargesForServices = ref(false)
+const isSubscribed = computed(() => userStore.subscribed === true)
 
 const token = computed(() => userStore.token)
 
@@ -33,7 +32,9 @@ const initializeRoles = () => {
 const pricingTiers = computed(() => userStore.pricing_tiers || [])
 
 const previewUrl = computed(() =>
-  selectedProfileImage.value ? URL.createObjectURL(selectedProfileImage.value) : userStore.profile_picture
+  selectedProfileImage.value
+    ? URL.createObjectURL(selectedProfileImage.value)
+    : userStore.profile_picture,
 )
 
 const handleFileChange = (e) => {
@@ -137,9 +138,8 @@ const handleSubmit = async (event) => {
           last_name: userStore.last_name,
           hide_name: userStore.hide_name,
           role_ids: selectedRoles.value,
-          charges_for_services: chargesForServices.value,
           turnaround_time: userStore.turnaround_time,
-          pricing_tiers_attributes: chargesForServices.value
+          pricing_tiers_attributes: isSubscribed.value
             ? pricingTiers.value.map((tier) => ({
                 id: tier.id,
                 word_count: tier.wordCount,
@@ -171,16 +171,6 @@ const handleSubmit = async (event) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
-
-watch(
-  () => userStore.charges_for_services,
-  (isPaid) => {
-    if (typeof isPaid === 'boolean') {
-      chargesForServices.value = isPaid
-    }
-  },
-  { immediate: true },
-)
 
 onMounted(async () => {
   userStore.restoreFromLocalStorage()
@@ -326,21 +316,13 @@ onMounted(async () => {
           </fieldset>
         </section>
 
-        <!-- Pricing Section - Only show if user selected reader roles -->
-        <section v-if="isReaderRole" class="form-section">
+        <!-- Pricing Section - Only show if user is a subscribed reader -->
+        <section v-if="isReaderRole && isSubscribed" class="form-section">
           <fieldset class="pricing-fieldset">
             <legend>Service Pricing:</legend>
 
-            <!-- Checkbox Toggle -->
-            <div class="pricing-toggle">
-              <label>
-                <input type="checkbox" v-model="chargesForServices" />
-                I charge for my services
-              </label>
-            </div>
-
             <!-- Pricing Tiers -->
-            <div v-if="chargesForServices" class="pricing-tiers">
+            <div class="pricing-tiers">
               <div
                 v-for="(tier, index) in pricingTiers"
                 :key="tier.id || index"
@@ -368,8 +350,8 @@ onMounted(async () => {
           </fieldset>
         </section>
 
-        <!-- Payment Options Section -->
-        <section v-if="isReaderRole" class="form-section">
+        <!-- Payment Options Section - Only show if user is a subscribed reader -->
+        <section v-if="isReaderRole && isSubscribed" class="form-section">
           <fieldset class="payment-fieldset">
             <legend>Payment Options:</legend>
             <div class="form-group">
