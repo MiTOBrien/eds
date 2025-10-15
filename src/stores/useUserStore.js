@@ -10,6 +10,7 @@ export const useUserStore = defineStore('user', () => {
   const email = ref('')
   const first_name = ref('')
   const last_name = ref('')
+  const subscribed = ref(false)
   const hide_name = ref(false)
   const bio = ref('')
   const profile_picture = ref('')
@@ -34,6 +35,7 @@ export const useUserStore = defineStore('user', () => {
     email.value = userData.email
     first_name.value = userData.first_name
     last_name.value = userData.last_name
+    subscribed.value = !!userData.subscribed
     hide_name.value = userData.hide_name || false
     bio.value = userData.bio || ''
     profile_picture.value = userData.profile_picture || ''
@@ -91,6 +93,7 @@ export const useUserStore = defineStore('user', () => {
     email.value = ''
     first_name.value = ''
     last_name.value = ''
+    subscribed.value = false
     hide_name.value = false
     bio.value = ''
     profile_picture.value = ''
@@ -129,6 +132,7 @@ export const useUserStore = defineStore('user', () => {
     email,
     first_name,
     last_name,
+    subscribed,
     hide_name,
     bio,
     profile_picture,
