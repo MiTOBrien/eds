@@ -1,11 +1,14 @@
 <script setup>
 import { onMounted } from 'vue';
+import { useUserStore } from '@/stores/useUserStore'
 import NavbarView from './NavbarView.vue'
+
+const userStore = useUserStore()
 
 onMounted(async () => {
   const response = await fetch('/api/user', { credentials: 'include' });
   const user = await response.json();
-  store.commit('setUser', user); // or however you update Vuex/pinia
+  userStore.setUser(user);
 });
 </script>
 
