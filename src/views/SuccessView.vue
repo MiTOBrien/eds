@@ -1,5 +1,12 @@
 <script setup>
+import { onMounted } from 'vue';
 import NavbarView from './NavbarView.vue'
+
+onMounted(async () => {
+  const response = await fetch('/api/user', { credentials: 'include' });
+  const user = await response.json();
+  store.commit('setUser', user); // or however you update Vuex/pinia
+});
 </script>
 
 <template>

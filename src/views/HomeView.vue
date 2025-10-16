@@ -135,8 +135,8 @@ const filteredReaders = computed(() => {
 
     const matchesService =
       selectedServiceFilter.value === 'all' ||
-      (selectedServiceFilter.value === 'free' && !reader.charges_for_services) ||
-      (selectedServiceFilter.value === 'paid' && reader.charges_for_services)
+      (selectedServiceFilter.value === 'free' && !reader.subscribed) ||
+      (selectedServiceFilter.value === 'paid' && reader.subscribed)
 
     const matchesGenre =
       selectedGenreFilter.value === 'all' ||
@@ -199,11 +199,11 @@ watchEffect(() => {
         </div>
 
         <div class="filter-group">
-          <label for="service-filter">Service Type:</label>
+          <label for="service-filter">Reader Type:</label>
           <select v-model="selectedServiceFilter" id="service-filter" class="filter-select">
-            <option value="all">All Services</option>
-            <option value="free">Free Services</option>
-            <option value="paid">Paid Services</option>
+            <option value="all">All Readers</option>
+            <option value="free">Free Readers</option>
+            <option value="paid">Paid Readers</option>
           </select>
         </div>
 
@@ -260,8 +260,8 @@ watchEffect(() => {
           </h3>
           <p class="reader-username"><strong>Username:</strong> {{ reader.username }}</p>
           <p class="reader-roles">{{ getReaderRoles(reader.roles) }}</p>
-          <p class="service-type" :class="{ 'paid-service': reader.charges_for_services }">
-            {{ reader.charges_for_services ? 'Paid Services' : 'Free Services' }}
+          <p class="service-type" :class="{ 'paid-service': reader.subscribed }">
+            {{ reader.subscribed ? 'Paid Reader' : 'Free Reader' }}
           </p>
 
           <!-- Contact Info -->
