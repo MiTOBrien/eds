@@ -239,7 +239,11 @@ watchEffect(() => {
 
     <!-- Readers Grid -->
     <div v-else-if="filteredReaders.length > 0" class="readers-grid">
-      <div v-for="reader in filteredReaders" :key="reader.id" class="reader-card">
+      <div
+        v-for="reader in filteredReaders"
+        :key="reader.id"
+        :class="['reader-card', { 'subscriber-border': reader.subscribed }]"
+      >
         <!-- Profile Photo -->
         <div class="reader-photo">
           <img
@@ -502,6 +506,12 @@ watchEffect(() => {
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
+}
+
+.subscriber-border {
+  border: 2px solid #2ecc71;
+  box-shadow: 0 0 8px rgba(46, 204, 113, 0.4);
+  border-radius: 8px;
 }
 
 .reader-card:hover {
