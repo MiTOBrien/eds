@@ -170,8 +170,8 @@ const filteredUsers = computed(() => {
 
     const matchesService =
       selectedServiceFilter.value === 'all' ||
-      (selectedServiceFilter.value === 'free' && !user.charges_for_services) ||
-      (selectedServiceFilter.value === 'paid' && user.charges_for_services)
+      (selectedServiceFilter.value === 'free' && !user.subscribed) ||
+      (selectedServiceFilter.value === 'paid' && user.subscribed)
 
     const matchesAccountStatus =
       selectedAccountStatusFilter.value === 'all' ||
@@ -244,11 +244,11 @@ onMounted(async () => {
           </div>
 
           <div class="filter-group">
-            <label for="service-filter">Service Type:</label>
+            <label for="service-filter">Reader Type:</label>
             <select v-model="selectedServiceFilter" id="service-filter" class="filter-select">
-              <option value="all">All Services</option>
-              <option value="free">Free Services</option>
-              <option value="paid">Paid Services</option>
+              <option value="all">All Readers</option>
+              <option value="free">Free Readers</option>
+              <option value="paid">Paid Readers</option>
             </select>
           </div>
 
