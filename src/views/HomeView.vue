@@ -281,7 +281,7 @@ watchEffect(() => {
 
           <!-- Pricing Tiers -->
           <div
-            v-if="reader.charges_for_services && reader.pricing_tiers?.length"
+            v-if="reader.subscribed && reader.pricing_tiers?.length"
             class="pricing-display"
           >
             <strong>Pricing Tiers:</strong>

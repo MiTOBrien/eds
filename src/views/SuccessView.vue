@@ -3,12 +3,28 @@ import { onMounted } from 'vue';
 import { useUserStore } from '@/stores/useUserStore'
 import NavbarView from './NavbarView.vue'
 
+const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
 
 onMounted(async () => {
-  const response = await fetch('/api/user', { credentials: 'include' });
-  const user = await response.json();
-  userStore.setUser(user);
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+        Accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const user = await response.json();
+    userStore.setUser(user);
+  } catch (err) {
+    console.error('Failed to refresh user after subscription:', err);
+  }
 });
 </script>
 
