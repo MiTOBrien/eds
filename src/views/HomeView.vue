@@ -255,6 +255,7 @@ watchEffect(() => {
 
         <!-- Reader Info -->
         <div class="reader-info">
+          <div v-if="reader.subscribed" class="premium-badge">Subscriber</div>
           <h3 :class="['reader-name', { hidden: reader.hide_name }]">
             {{
               reader.hide_name
@@ -280,10 +281,7 @@ watchEffect(() => {
           </p>
 
           <!-- Pricing Tiers -->
-          <div
-            v-if="reader.subscribed && reader.pricing_tiers?.length"
-            class="pricing-display"
-          >
+          <div v-if="reader.subscribed && reader.pricing_tiers?.length" class="pricing-display">
             <strong>Pricing Tiers:</strong>
             <ul class="pricing-list">
               <li v-for="(tier, index) in reader.pricing_tiers" :key="index">
@@ -300,9 +298,11 @@ watchEffect(() => {
             class="payment-display"
           >
             <strong>Preferred Payment Methods:</strong>
-            <ul>
-              <li v-for="method in reader.payment_options" :key="method">{{ method }}</li>
-            </ul>
+            <div class="payment-tags">
+              <span v-for="method in reader.payment_options" :key="method" class="payment-tag">
+                {{ method }}
+              </span>
+            </div>
           </div>
 
           <!-- Genre & Subgenre Display -->
@@ -508,6 +508,18 @@ watchEffect(() => {
     box-shadow 0.3s ease;
 }
 
+.premium-badge {
+  display: inline-block;
+  background-color: #2ecc71;
+  color: white;
+  font-weight: bold;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 0 4px rgba(46, 204, 113, 0.4);
+}
+
 .subscriber-border {
   border: 2px solid #2ecc71;
   box-shadow: 0 0 8px rgba(46, 204, 113, 0.4);
@@ -607,6 +619,22 @@ watchEffect(() => {
   padding-left: 1rem;
   list-style-type: disc;
 }
+
+.payment-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.payment-tag {
+  background-color: #f0f0f0;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
 
 .reader-bio {
   margin-bottom: 1rem;
