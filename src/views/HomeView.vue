@@ -2,9 +2,20 @@
 import { ref, computed, onMounted, watchEffect } from 'vue'
 import { useUserStore } from '@/stores/useUserStore'
 import NavbarView from './NavbarView.vue'
+import ReaderModal from '@/components/ReaderModal.vue'
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const userStore = useUserStore()
+
+const selectedReader = ref(null)
+
+const openModal = (reader) => {
+  selectedReader.value = reader
+}
+
+const closeModal = () => {
+  selectedReader.value = null
+}
 
 const token = computed(() => userStore.token)
 const readers = ref([])
@@ -75,17 +86,6 @@ const handleImageError = (event) => {
     img.src = '/default-avatar.png'
     img.dataset.fallback = 'true'
   }
-}
-
-const formatSocialLink = (platform, handle) => {
-  if (!handle) return null
-  const cleanHandle = handle.replace('@', '').trim()
-  const urls = {
-    facebook: 'https://facebook.com/',
-    instagram: 'https://instagram.com/',
-    x: 'https://x.com/',
-  }
-  return urls[platform] + cleanHandle
 }
 
 const fetchGenres = async () => {
@@ -238,129 +238,51 @@ watchEffect(() => {
     </div>
 
     <!-- Readers Grid -->
-    <div v-else-if="filteredReaders.length > 0" class="readers-grid">
-      <div
-        v-for="reader in filteredReaders"
-        :key="reader.id"
-        :class="['reader-card', { 'subscriber-border': reader.subscribed }]"
-      >
-        <!-- Profile Photo -->
-        <div class="reader-photo">
-          <img
-            :src="getProfileImageUrl(reader)"
-            :alt="`${reader.first_name} ${reader.last_name}`"
-            @error="handleImageError"
-          />
-        </div>
+<div v-else-if="filteredReaders.length > 0" class="readers-grid">
+  <div
+    v-for="reader in filteredReaders"
+    :key="reader.id"
+    :class="['reader-card', { 'subscriber-border': reader.subscribed }]"
+  >
+    <!-- Profile Photo -->
+    <div class="reader-photo">
+      <img
+        :src="getProfileImageUrl(reader)"
+        :alt="`${reader.first_name} ${reader.last_name}`"
+        @error="handleImageError"
+      />
+    </div>
 
-        <!-- Reader Info -->
-        <div class="reader-info">
-          <div v-if="reader.subscribed" class="premium-badge">Subscriber</div>
-          <h3 :class="['reader-name', { hidden: reader.hide_name }]">
-            {{
-              reader.hide_name
-                ? 'Name hidden by reader'
-                : `${reader.first_name} ${reader.last_name}`
-            }}
-          </h3>
-          <p class="reader-username"><strong>Username:</strong> {{ reader.username }}</p>
-          <p class="reader-roles">{{ getReaderRoles(reader.roles) }}</p>
-          <p class="service-type" :class="{ 'paid-service': reader.subscribed }">
-            {{ reader.subscribed ? 'Paid Reader' : 'Free Reader' }}
-          </p>
+    <!-- Reader Info -->
+    <div class="reader-info">
+      <div v-if="reader.subscribed" class="premium-badge">Subscriber</div>
+      <h3 :class="['reader-name', { hidden: reader.hide_name }]">
+        {{
+          reader.hide_name
+            ? 'Name hidden by reader'
+            : `${reader.first_name} ${reader.last_name}`
+        }}
+      </h3>
+      <p class="reader-username"><strong>Username:</strong> {{ reader.username }}</p>
+      <p class="reader-roles">{{ getReaderRoles(reader.roles) }}</p>
+      <p class="service-type" :class="{ 'paid-service': reader.subscribed }">
+        {{ reader.subscribed ? 'Paid Reader' : 'Free Reader' }}
+      </p>
 
-          <!-- Contact Info -->
-          <p class="email">
-            <strong>Contact Email: </strong>
-            <a :href="`mailto:${reader.email}`">{{ reader.email }}</a>
-          </p>
+      <p class="turnaround-time">
+        <strong>Estimated Turnaround Time:</strong> {{ reader.turnaround_time_label }}
+      </p>
 
-          <!-- Turnaround Time -->
-          <p class="turnaround-time">
-            <strong>Estimated Turnaround Time:</strong> {{ reader.turnaround_time_label }}
-          </p>
-
-          <!-- Pricing Tiers -->
-          <div v-if="reader.subscribed && reader.pricing_tiers?.length" class="pricing-display">
-            <strong>Pricing Tiers:</strong>
-            <ul class="pricing-list">
-              <li v-for="(tier, index) in reader.pricing_tiers" :key="index">
-                Up to {{ tier.word_count.toLocaleString() }} words: ${{
-                  (tier.price_cents / 100).toFixed(2)
-                }}
-              </li>
-            </ul>
-          </div>
-
-          <!-- Payment Options -->
-          <div
-            v-if="Array.isArray(reader.payment_options) && reader.payment_options.length"
-            class="payment-display"
-          >
-            <strong>Preferred Payment Methods:</strong>
-            <div class="payment-tags">
-              <span v-for="method in reader.payment_options" :key="method" class="payment-tag">
-                {{ method }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Genre & Subgenre Display -->
-          <div v-if="reader.genres && reader.genres.length" class="genre-display">
-            <strong>Preferred Genres:</strong>
-            <div class="genre-tags">
-              <span v-for="genre in reader.genres" :key="genre.id" class="genre-tag">
-                {{ genre.name }}
-                <span v-for="sub in genre.subgenres" :key="sub.id" class="subgenre-tag">
-                  • {{ sub.name }}
-                </span>
-              </span>
-            </div>
-          </div>
-
-          <!-- Bio -->
-          <p><strong>About:</strong></p>
-          <p v-if="reader.bio" class="reader-bio">{{ reader.bio }}</p>
-
-          <!-- Social Links -->
-          <div class="social-links" v-if="reader.facebook || reader.instagram || reader.x">
-            <h4>Social Media</h4>
-            <ul class="social-list">
-              <li v-if="reader.facebook">
-                <strong>Facebook: </strong>
-                <a
-                  :href="formatSocialLink('facebook', reader.facebook)"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {{ formatSocialLink('facebook', reader.facebook) }}
-                </a>
-              </li>
-              <li v-if="reader.instagram">
-                <strong>Instagram: </strong>
-                <a
-                  :href="formatSocialLink('instagram', reader.instagram)"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {{ formatSocialLink('instagram', reader.instagram) }}
-                </a>
-              </li>
-              <li v-if="reader.x">
-                <strong>X: </strong>
-                <a
-                  :href="formatSocialLink('x', reader.x)"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {{ formatSocialLink('x', reader.x) }}
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
+      <!-- View Details Button -->
+      <div class="view-details">
+        <button @click="openModal(reader)">View Details</button>
       </div>
     </div>
+  </div>
+</div>
+
+
+    <ReaderModal v-if="selectedReader" :reader="selectedReader" @close="closeModal" />
 
     <!-- No Results -->
     <div v-else class="no-results">
@@ -634,7 +556,6 @@ watchEffect(() => {
   font-size: 0.85rem;
   white-space: nowrap;
 }
-
 
 .reader-bio {
   margin-bottom: 1rem;
