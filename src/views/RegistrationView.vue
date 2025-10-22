@@ -52,6 +52,7 @@ const register = async () => {
           first_name: first_name.value,
           last_name: last_name.value,
           password: password.value,
+          confirm_password: confirmPassword.value,
           role_ids: selectedRoles.value,
           tos_accepted: acceptedTOS.value,
         },

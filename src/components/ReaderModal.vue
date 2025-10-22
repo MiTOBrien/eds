@@ -47,7 +47,17 @@ const formatSocialLink = (platform, handle) => {
         </div>
       </div>
 
-      <!-- Add more fields as needed -->
+      <div v-if="reader.subscribed && reader.pricing_tiers?.length" class="pricing-display">
+        <strong>Pricing Tiers:</strong>
+        <ul class="pricing-list">
+          <li v-for="(tier, index) in reader.pricing_tiers" :key="index">
+            Up to {{ tier.word_count.toLocaleString() }} words: ${{
+              (tier.price_cents / 100).toFixed(2)
+            }}
+          </li>
+        </ul>
+      </div>
+
       <div class="social-links" v-if="reader.facebook || reader.instagram || reader.x">
         <h4>Social Media</h4>
         <ul class="social-list">
@@ -96,14 +106,20 @@ const formatSocialLink = (platform, handle) => {
   align-items: center;
   z-index: 1000;
 }
+
 .modal-content {
   background: white;
   padding: 2rem;
   border-radius: 10px;
   max-width: 600px;
   width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
+  box-sizing: border-box;
 }
+
 .close-btn {
   position: absolute;
   top: 1rem;
@@ -113,6 +129,7 @@ const formatSocialLink = (platform, handle) => {
   border: none;
   cursor: pointer;
 }
+
 .genre-list {
   list-style: none;
   padding-left: 0;
@@ -139,6 +156,7 @@ const formatSocialLink = (platform, handle) => {
   font-size: 0.85rem;
   color: #666;
 }
+
 .payment-display {
   margin-top: 1rem;
 }
@@ -156,5 +174,20 @@ const formatSocialLink = (platform, handle) => {
   border-radius: 6px;
   font-size: 0.85rem;
   white-space: nowrap;
+}
+
+.pricing-display {
+  margin-top: 1rem;
+}
+
+.pricing-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+}
+
+.pricing-list li {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
 }
 </style>

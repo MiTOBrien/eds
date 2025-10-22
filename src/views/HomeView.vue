@@ -238,54 +238,53 @@ watchEffect(() => {
     </div>
 
     <!-- Readers Grid -->
-<div v-else-if="filteredReaders.length > 0" class="readers-grid">
-  <div
-    v-for="reader in filteredReaders"
-    :key="reader.id"
-    :class="['reader-card', { 'subscriber-border': reader.subscribed }]"
-  >
-    <!-- Profile Photo -->
-    <div class="reader-photo">
-      <img
-        :src="getProfileImageUrl(reader)"
-        :alt="`${reader.first_name} ${reader.last_name}`"
-        @error="handleImageError"
-      />
-    </div>
+    <div v-else-if="filteredReaders.length > 0" class="readers-grid">
+      <div
+        v-for="reader in filteredReaders"
+        :key="reader.id"
+        :class="['reader-card', { 'subscriber-border': reader.subscribed }]"
+      >
+        <!-- Profile Photo -->
+        <div class="reader-photo">
+          <img
+            :src="getProfileImageUrl(reader)"
+            :alt="`${reader.first_name} ${reader.last_name}`"
+            @error="handleImageError"
+          />
+        </div>
 
-    <!-- Reader Info -->
-    <div class="reader-info">
-      <div v-if="reader.subscribed" class="premium-badge">Subscriber</div>
-      <h3 :class="['reader-name', { hidden: reader.hide_name }]">
-        {{
-          reader.hide_name
-            ? 'Name hidden by reader'
-            : `${reader.first_name} ${reader.last_name}`
-        }}
-      </h3>
-      <p class="reader-username"><strong>Username:</strong> {{ reader.username }}</p>
-      <p class="reader-roles">{{ getReaderRoles(reader.roles) }}</p>
-      <p class="service-type" :class="{ 'paid-service': reader.subscribed }">
-        {{ reader.subscribed ? 'Paid Reader' : 'Free Reader' }}
-      </p>
+        <!-- Reader Info -->
+        <div class="reader-info">
+          <div v-if="reader.subscribed" class="premium-badge">Subscriber</div>
+          <h3 :class="['reader-name', { hidden: reader.hide_name }]">
+            {{
+              reader.hide_name
+                ? 'Name hidden by reader'
+                : `${reader.first_name} ${reader.last_name}`
+            }}
+          </h3>
+          <p class="reader-username"><strong>Username:</strong> {{ reader.username }}</p>
+          <p class="reader-roles">{{ getReaderRoles(reader.roles) }}</p>
+          <p class="service-type" :class="{ 'paid-service': reader.subscribed }">
+            {{ reader.subscribed ? 'Paid Reader' : 'Free Reader' }}
+          </p>
 
-      <p class="turnaround-time">
-        <strong>Estimated Turnaround Time:</strong> {{ reader.turnaround_time_label }}
-      </p>
+          <p class="turnaround-time">
+            <strong>Estimated Turnaround Time:</strong> {{ reader.turnaround_time_label }}
+          </p>
 
-      <!-- View Details Button -->
-      <div class="view-details">
-        <button @click="openModal(reader)">View Details</button>
+          <!-- View Details Button -->
+          <div class="view-details">
+            <button @click="openModal(reader)">View Details</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
-
 
     <ReaderModal v-if="selectedReader" :reader="selectedReader" @close="closeModal" />
 
     <!-- No Results -->
-    <div v-else class="no-results">
+    <div v-else-if="!loading.value && filteredReaders.length === 0 && !error" class="no-results">
       <p>No readers found matching your criteria.</p>
       <button @click="clearFilters" class="clear-filters-btn">Clear Filters</button>
     </div>
