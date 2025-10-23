@@ -91,4 +91,18 @@ const startCheckout = async (tier) => {
 button {
   margin-top: 1rem;
 }
+
+@media (max-width: 768px) {
+  .plan-options {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .plan-card {
+    width: 90%;
+    max-width: 300px;
+    margin-bottom: 1rem;
+  }
+}
+
 </style>
