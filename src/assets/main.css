@@ -40,7 +40,6 @@ body::after {
   right: 0;
 }
 
-
 h1,
 h2,
 h3 {
@@ -61,6 +60,10 @@ h2 {
 h3 {
   font-size: 1.5rem;
   margin-bottom: 0.25rem;
+}
+
+main {
+  padding-top: 60px;
 }
 
 p {
