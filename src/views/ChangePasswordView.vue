@@ -75,50 +75,52 @@ const handleChangePassword = async () => {
 </script>
 
 <template>
-  <div class="header-section">
-    <NavbarView />
-    <hr />
-  </div>
-  <div class="container mt-5">
-    <h3>Change Password</h3>
-    <form @submit.prevent="handleChangePassword">
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="currentPassword" class="form-label">Current Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="currentPassword"
-            v-model="currentPassword"
-            required
-          />
+  <main>
+    <div class="header-section">
+      <NavbarView />
+      <hr />
+    </div>
+    <div class="container mt-5">
+      <h3>Change Password</h3>
+      <form @submit.prevent="handleChangePassword">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="currentPassword" class="form-label">Current Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="currentPassword"
+              v-model="currentPassword"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="newPassword" class="form-label">New Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="newPassword"
+              v-model="newPassword"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="confirmNewPassword"
+              v-model="confirmNewPassword"
+              required
+            />
+          </div>
         </div>
-        <div class="form-group">
-          <label for="newPassword" class="form-label">New Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="newPassword"
-            v-model="newPassword"
-            required
-          />
+        <div class="button-wrapper">
+          <button type="submit" class="btn btn-primary">Change Password</button>
         </div>
-        <div class="form-group">
-          <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
-          <input
-            type="password"
-            class="form-control"
-            id="confirmNewPassword"
-            v-model="confirmNewPassword"
-            required
-          />
-        </div>
-      </div>
-      <div class="button-wrapper">
-        <button type="submit" class="btn btn-primary">Change Password</button>
-      </div>
-    </form>
-  </div>
+      </form>
+    </div>
+  </main>
 </template>
 
 <style scoped>
