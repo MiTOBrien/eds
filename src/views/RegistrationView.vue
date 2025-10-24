@@ -10,7 +10,9 @@ const username = ref('')
 const first_name = ref('')
 const last_name = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const confirmPassword = ref('')
+const showConfirmPassword = ref(false)
 const selectedRoles = ref([])
 const acceptedTOS = ref(false)
 
@@ -128,33 +130,49 @@ const register = async () => {
           />
         </div>
 
-        <div class="form-group">
+        <!-- Password Field -->
+        <div class="form-group password-wrapper">
           <p v-if="!isPasswordValid" class="validation-message">
             Password must be at least 8 characters and include uppercase, lowercase, and a number or
             symbol.
           </p>
           <label for="password">Password:</label>
-          <input
-            v-model="password"
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Enter your password"
-            required
-          />
+          <div class="password-field">
+            <input
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              required
+            />
+            <button type="button" class="toggle-password" @click="showPassword = !showPassword">
+              {{ showPassword ? 'Hide' : 'Show' }}
+            </button>
+          </div>
         </div>
 
-        <div class="form-group">
+        <!-- Confirm Password Field -->
+        <div class="form-group password-wrapper">
           <p v-if="!doPasswordsMatch" class="validation-message">Passwords do not match.</p>
           <label for="confirmpassword">Confirm Password:</label>
-          <input
-            v-model="confirmPassword"
-            type="password"
-            id="confirmpassword"
-            name="confirmpassword"
-            placeholder="Confirm your password"
-            required
-          />
+          <div class="password-field">
+            <input
+              v-model="confirmPassword"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              id="confirmpassword"
+              name="confirmpassword"
+              placeholder="Confirm your password"
+              required
+            />
+            <button
+              type="button"
+              class="toggle-password"
+              @click="showConfirmPassword = !showConfirmPassword"
+            >
+              {{ showConfirmPassword ? 'Hide' : 'Show' }}
+            </button>
+          </div>
         </div>
 
         <div class="form-group">
@@ -289,57 +307,27 @@ main {
   cursor: pointer;
 }
 
-/* Service Pricing Styles */
-.pricing-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.pricing-option {
+.password-field {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  position: relative;
 }
 
-.pricing-option input[type='radio'] {
-  width: 18px;
-  height: 18px;
-  accent-color: #007bff;
+.password-field input {
+  flex: 1;
+  padding-right: 4rem;
 }
 
-.pricing-option label {
-  margin: 0;
-  font-weight: normal;
+.toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 500;
   cursor: pointer;
 }
 
-/* Subscription Styles */
-.subscription-info.free-plan {
-  background: #e8f5e8;
-  border: 2px solid #4caf50;
-  border-radius: 8px;
-  padding: 1rem;
-  text-align: center;
-}
-
-.subscription-info h3 {
-  margin: 0 0 0.5rem 0;
-  color: #2e7d32;
-}
-
-.subscription-info .price {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #2e7d32;
-  margin: 0.5rem 0;
-}
-
-.subscription-info .plan-description {
-  margin: 0.5rem 0 0 0;
-  color: #555;
-}
 
 /* Free Plan Acknowledgment Styles */
 .acknowledgment-wrapper {
@@ -370,98 +358,6 @@ main {
   font-weight: 500;
   cursor: pointer;
   margin: 0;
-}
-
-.subscription-note {
-  background: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 4px;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  color: #856404;
-}
-
-.plan-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.plan-option {
-  position: relative;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 0;
-  transition: all 0.3s ease;
-}
-
-.plan-option:hover {
-  border-color: #007bff;
-}
-
-.plan-option.active {
-  border-color: #007bff;
-  background: #f0f8ff;
-}
-
-.plan-option input[type='radio'] {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 18px;
-  height: 18px;
-  accent-color: #007bff;
-}
-
-.plan-label {
-  display: block;
-  padding: 1rem;
-  cursor: pointer;
-  margin: 0;
-  font-weight: normal;
-}
-
-.plan-details h3 {
-  margin: 0 0 0.5rem 0;
-  color: #333;
-}
-
-.plan-details .price {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #007bff;
-  margin: 0.25rem 0;
-}
-
-.plan-details .plan-description {
-  margin: 0.5rem 0 0 0;
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.savings-badge {
-  display: inline-block;
-  background: #28a745;
-  color: white;
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  margin-top: 0.5rem;
-  font-weight: 600;
-}
-
-.subscription-summary {
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  padding: 0.75rem;
-  text-align: center;
-}
-
-.subscription-summary p {
-  margin: 0;
-  color: #495057;
 }
 
 .submit-btn {
