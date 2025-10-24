@@ -71,6 +71,19 @@ const getReaderRoles = (roles) => {
   return roles.map((r) => r.name || `Role ${r.id}`).join(', ')
 }
 
+const roleSummary = ref([])
+
+const fetchRoleSummary = async () => {
+  const response = await fetch(`${API_BASE_URL}/admin/role_summary`, {
+    headers: {
+      Authorization: `Bearer ${token.value}`,
+      Accept: 'application/json',
+    },
+  })
+  const data = await response.json()
+  roleSummary.value = data.summary || []
+}
+
 const getProfileImageUrl = (reader) => {
   if (reader.profile_picture) {
     return reader.profile_picture.startsWith('http')
@@ -154,6 +167,7 @@ const filteredReaders = computed(() => {
 onMounted(() => {
   if (token.value) {
     fetchReaders()
+    fetchRoleSummary()
     fetchGenres()
   }
 })
@@ -176,6 +190,12 @@ watchEffect(() => {
       <p class="subtitle">Connect with experienced ARC readers, beta readers, and proofreaders</p>
     </div>
 
+    <div class="role-cards">
+      <div v-for="role in roleSummary" :key="role.role" class="role-card">
+        <h4>{{ role.role }}</h4>
+        <p>{{ role.count }} users</p>
+      </div>
+    </div>
     <!-- Search and Filter Section -->
     <div class="search-filters">
       <div class="search-bar">
@@ -311,6 +331,20 @@ watchEffect(() => {
 .subtitle {
   color: #666;
   font-size: 1.1rem;
+}
+
+.role-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.role-card {
+  background: #f1f3f5;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  flex: 1;
 }
 
 /* Search and Filters */
