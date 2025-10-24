@@ -6,6 +6,7 @@ import { useUserStore } from '@/stores/useUserStore'
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 const email = ref('')
 const password = ref('')
+const showPassword = ref(false)
 const isLoading = ref(false)
 const router = useRouter()
 const userStore = useUserStore()
@@ -85,17 +86,22 @@ const login = async () => {
           />
         </div>
 
-        <div class="form-group">
+        <div class="form-group password-wrapper">
           <label for="password">Password:</label>
-          <input
-            v-model="password"
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Enter your password"
-            required
-            :disabled="isLoading"
-          />
+          <div class="password-field">
+            <input
+              v-model="password"
+              :type="showPassword ? 'text' : 'password'"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              required
+              :disabled="isLoading"
+            />
+            <button type="button" class="toggle-password" @click="showPassword = !showPassword">
+              {{ showPassword ? 'Hide' : 'Show' }}
+            </button>
+          </div>
         </div>
 
         <button type="submit" class="submit-btn" :disabled="isLoading">
@@ -179,6 +185,28 @@ main {
   margin-top: 1.5rem;
   color: #666;
 }
+
+.password-field {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.password-field input {
+  flex: 1;
+  padding-right: 4rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 500;
+  cursor: pointer;
+}
+
 
 /* Responsive design */
 @media (max-width: 480px) {

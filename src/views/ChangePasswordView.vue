@@ -8,8 +8,11 @@ const userStore = useUserStore()
 
 const token = computed(() => userStore.token)
 const currentPassword = ref('')
+const showCurrentPassword = ref(false)
 const newPassword = ref('')
+const showNewPassword = ref(false)
 const confirmNewPassword = ref('')
+const showConfirmNewPassword = ref(false)
 const passwordErrors = ref([])
 
 const validatePassword = () => {
@@ -84,35 +87,67 @@ const handleChangePassword = async () => {
       <h3>Change Password</h3>
       <form @submit.prevent="handleChangePassword">
         <div class="form-grid">
-          <div class="form-group">
+          <!-- Current Password -->
+          <div class="form-group password-wrapper">
             <label for="currentPassword" class="form-label">Current Password</label>
-            <input
-              type="password"
-              class="form-control"
-              id="currentPassword"
-              v-model="currentPassword"
-              required
-            />
+            <div class="password-field">
+              <input
+                :type="showCurrentPassword ? 'text' : 'password'"
+                class="form-control"
+                id="currentPassword"
+                v-model="currentPassword"
+                required
+              />
+              <button
+                type="button"
+                class="toggle-password"
+                @click="showCurrentPassword = !showCurrentPassword"
+              >
+                {{ showCurrentPassword ? 'Hide' : 'Show' }}
+              </button>
+            </div>
           </div>
-          <div class="form-group">
+
+          <!-- New Password -->
+          <div class="form-group password-wrapper">
             <label for="newPassword" class="form-label">New Password</label>
-            <input
-              type="password"
-              class="form-control"
-              id="newPassword"
-              v-model="newPassword"
-              required
-            />
+            <div class="password-field">
+              <input
+                :type="showNewPassword ? 'text' : 'password'"
+                class="form-control"
+                id="newPassword"
+                v-model="newPassword"
+                required
+              />
+              <button
+                type="button"
+                class="toggle-password"
+                @click="showNewPassword = !showNewPassword"
+              >
+                {{ showNewPassword ? 'Hide' : 'Show' }}
+              </button>
+            </div>
           </div>
-          <div class="form-group">
+
+          <!-- Confirm New Password -->
+          <div class="form-group password-wrapper">
             <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
-            <input
-              type="password"
-              class="form-control"
-              id="confirmNewPassword"
-              v-model="confirmNewPassword"
-              required
-            />
+            <div class="password-field">
+              <input
+                :type="showConfirmNewPassword ? 'text' : 'password'"
+                class="form-control"
+                id="confirmNewPassword"
+                v-model="confirmNewPassword"
+                required
+              />
+              <button
+                type="button"
+                class="toggle-password"
+                @click="showConfirmNewPassword = !showConfirmNewPassword"
+              >
+                {{ showConfirmNewPassword ? 'Hide' : 'Show' }}
+              </button>
+            </div>
           </div>
         </div>
         <div class="button-wrapper">
@@ -153,6 +188,27 @@ const handleChangePassword = async () => {
   display: flex;
   justify-content: center;
   margin-top: 1.5rem;
+}
+
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-field input {
+  flex: 1;
+  padding-right: 4rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 .btn-primary {
