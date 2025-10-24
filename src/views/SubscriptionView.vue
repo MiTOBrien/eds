@@ -34,6 +34,27 @@ const startCheckout = async (tier) => {
     alert('Unable to start payment process.')
   }
 }
+
+const cancelSubscription = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/payments/${userStore.subscriptionId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    const data = await response.json()
+    if (data.success) {
+      alert('Your subscription will be canceled at the end of the billing cycle.')
+    } else {
+      alert('Unable to cancel subscription. Please try again.')
+    }
+  } catch (err) {
+    console.error('Cancel error:', err)
+    alert('Something went wrong.')
+  }
+}
 </script>
 
 <template>
@@ -67,6 +88,16 @@ const startCheckout = async (tier) => {
         <p>$120/year</p>
         <button @click="startCheckout('annual')">Choose Annual</button>
       </div>
+
+      <div class="plan-card" :class="{ active: selectedPlan === 'lifetime' }">
+        <h2>Lifetime Plan</h2>
+        <p>$500</p>
+        <button @click="startCheckout('lifetime')">Choose Lifetime</button>
+      </div>
+    </div>
+
+    <div class="cancel-wrapper">
+      <button @click="cancelSubscription">Cancel Subscription</button>
     </div>
   </main>
 </template>
@@ -74,9 +105,11 @@ const startCheckout = async (tier) => {
 <style scoped>
 .plan-options {
   display: flex;
+  justify-content: center;
   gap: 2rem;
   margin-top: 2rem;
 }
+
 .plan-card {
   border: 1px solid #ccc;
   padding: 1rem;
@@ -84,12 +117,34 @@ const startCheckout = async (tier) => {
   width: 200px;
   text-align: center;
 }
+
 .plan-card.active {
   border-color: #0070f3;
   background-color: #f0f8ff;
 }
+
 button {
   margin-top: 1rem;
+}
+
+.cancel-wrapper {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.cancel-button {
+  background-color: #f87171; /* soft red */
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.cancel-button:hover {
+  background-color: #dc2626; /* deeper red */
 }
 
 @media (max-width: 768px) {
@@ -104,5 +159,4 @@ button {
     margin-bottom: 1rem;
   }
 }
-
 </style>
