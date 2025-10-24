@@ -19,6 +19,12 @@ const isAdmin = computed(
   () => Array.isArray(userStore.roles) && userStore.roles.includes(ADMIN_ROLE_ID),
 )
 
+const allowedRoles = [3, 4, 5]
+const canViewSubscriptions = computed(
+  () =>
+    Array.isArray(userStore.roles) && userStore.roles.some((role) => allowedRoles.includes(role)),
+)
+
 const displayName = computed(() => {
   if (username.value) return username.value
   if (firstName.value && lastName.value) {
@@ -79,7 +85,9 @@ onUnmounted(() => {
       <div class="navbar-left navbar-links" :class="{ open: isOpen }">
         <RouterLink class="nav-link home-link" to="/home">Home</RouterLink>
         <RouterLink class="nav-link" to="/profile">Profile</RouterLink>
-        <RouterLink class="nav-link" to="/subscriptions">Subscriptions</RouterLink>
+        <RouterLink v-if="canViewSubscriptions" class="nav-link" to="/subscriptions"
+          >Subscriptions</RouterLink
+        >
         <router-link v-if="isAdmin" to="/admin" class="nav-link">Admin Panel</router-link>
       </div>
 
