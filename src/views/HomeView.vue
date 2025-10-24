@@ -74,7 +74,7 @@ const getReaderRoles = (roles) => {
 const roleSummary = ref([])
 
 const fetchRoleSummary = async () => {
-  const response = await fetch(`${API_BASE_URL}/admin/role_summary`, {
+  const response = await fetch(`${API_BASE_URL}/users/role-summary`, {
     headers: {
       Authorization: `Bearer ${token.value}`,
       Accept: 'application/json',
@@ -196,6 +196,7 @@ watchEffect(() => {
         <p>{{ role.count }} users</p>
       </div>
     </div>
+
     <!-- Search and Filter Section -->
     <div class="search-filters">
       <div class="search-bar">
