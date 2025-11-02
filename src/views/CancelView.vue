@@ -7,7 +7,7 @@ import NavbarView from './NavbarView.vue'
     <NavbarView />
     <div class="cancel-container">
       <h2>❌ Payment Canceled</h2>
-      <p>Your subscription was not activated. No charges were made.</p>
+      <p>Your subscription is canceled.</p>
       <p>If you changed your mind or had trouble completing payment, you can try again below.</p>
       <router-link to="/subscriptions">
         <button>Return to Subscription Options</button>
