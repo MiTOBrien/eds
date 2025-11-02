@@ -3,7 +3,7 @@ import NavbarView from './NavbarView.vue'
 </script>
 
 <template>
-  <main class="faq-view">
+  <main>
     <div class="header-section">
       <NavbarView />
       <h3>Frequently Asked Questions</h3>

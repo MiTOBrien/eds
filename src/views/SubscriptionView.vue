@@ -37,7 +37,7 @@ const startCheckout = async (tier) => {
 
 const cancelSubscription = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/payments/${userStore.subscriptionId}`, {
+    const response = await fetch(`${API_BASE_URL}/payments/cancel/${userStore.subscriptionId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${userStore.token}`,
@@ -66,7 +66,7 @@ const cancelSubscription = async () => {
     </div>
     <p>
       Select a subscription plan to unlock premium features if you want to charge authors for your
-      services. <br /><strong>Note:</strong> If you are reported for requesting payment without a
+      services. This will allow you to select your preferred payment methods such as PayPal, Cashapp, Zelle, and more. You will also be able to set pricing tiers for your work such as 10,000 words for $30, 25,000 words for $50, etc. You can set as many pricing tiers as desired.  <br /><strong>Note:</strong> If you are reported for requesting payment without a
       paid subscription plan your account will be removed.
     </p>
 
@@ -95,8 +95,8 @@ const cancelSubscription = async () => {
         <button @click="startCheckout('lifetime')">Choose Lifetime</button>
       </div>
     </div>
-
     <div class="cancel-wrapper">
+      <hr />
       <button @click="cancelSubscription">Cancel Subscription</button>
     </div>
   </main>
