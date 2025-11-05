@@ -19,6 +19,7 @@ const formatSocialLink = (platform, handle) => {
       <button class="close-btn" @click="$emit('close')">×</button>
       <h2>{{ reader.first_name }} {{ reader.last_name }}</h2>
       <p><strong>Username:</strong> {{ reader.username }}</p>
+      <p><strong>Email:</strong> <a :href="`mailto:${reader.email}`">{{ reader.email }}</a></p>
       <p><strong>Roles:</strong> {{ getReaderRoles(reader.roles) }}</p>
       <p><strong>Bio:</strong> {{ reader.bio }}</p>
       <div v-if="reader.genres && reader.genres.length" class="genre-display">
