@@ -1,7 +1,10 @@
 <script setup>
 const props = defineProps({ reader: Object })
 
-const getReaderRoles = (roles) => roles.map((r) => r.role).join(', ')
+const getReaderRoles = (roles) => {
+  if (!Array.isArray(roles)) return ''
+  return roles.map((r) => r.name || `Role ${r.id}`).join(', ')
+}
 
 const formatSocialLink = (platform, handle) => {
   const baseUrls = {
