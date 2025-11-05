@@ -285,6 +285,10 @@ watchEffect(() => {
             }}
           </h3>
           <p class="reader-username"><strong>Username:</strong> {{ reader.username }}</p>
+          <p class="contact-info email">
+            <strong>Email:</strong>
+            <a :href="`mailto:${reader.email}`">{{ reader.email }}</a>
+          </p>
           <p class="reader-roles">{{ getReaderRoles(reader.roles) }}</p>
           <p class="service-type" :class="{ 'paid-service': reader.subscribed }">
             {{ reader.subscribed ? 'Paid Reader' : 'Free Reader' }}
