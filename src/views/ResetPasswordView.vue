@@ -57,19 +57,31 @@ const submitReset = async () => {
         Password must be at least 8 characters and include uppercase, lowercase, and a number or
         symbol.
       </p>
-      <input
-        type="password"
-        v-model="password"
-        :type="showPassword ? 'text' : 'password'"
-        placeholder="New password"
-      />
-      <p v-if="!doPasswordsMatch" class="validation-message">Passwords do not match.</p>
-      <input
-        type="password"
-        v-model="passwordConfirmation"
-        :type="showConfirmPassword ? 'text' : 'password'"
-        placeholder="Confirm password"
-      />
+      <div class="input-group">
+        <input
+          v-model="password"
+          :type="showPassword ? 'text' : 'password'"
+          placeholder="New password"
+        />
+        <button type="button" class="toggle-password" @click="showPassword = !showPassword">
+          {{ showPassword ? 'Hide' : 'Show' }}
+        </button>
+      </div>
+
+      <div class="input-group">
+        <input
+          v-model="passwordConfirmation"
+          :type="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Confirm password"
+        />
+        <button
+          type="button"
+          class="toggle-password"
+          @click="showConfirmPassword = !showConfirmPassword"
+        >
+          {{ showConfirmPassword ? 'Hide' : 'Show' }}
+        </button>
+      </div>
       <button type="submit" :disabled="!isPasswordValid || !doPasswordsMatch">
         Reset Password
       </button>
@@ -86,12 +98,36 @@ const submitReset = async () => {
   border: 1px solid #ccc;
   border-radius: 8px;
 }
+
 input {
   display: block;
   width: 100%;
   margin-bottom: 1rem;
   padding: 0.5rem;
 }
+
+.input-group {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.input-group input {
+  width: 100%;
+  padding-right: 4rem;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 500;
+  cursor: pointer;
+}
+
 button {
   padding: 0.5rem 1rem;
 }
