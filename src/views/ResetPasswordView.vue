@@ -8,7 +8,9 @@ const router = useRouter()
 const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL
 
 const password = ref('')
+const showPassword = ref(false)
 const passwordConfirmation = ref('')
+const showConfirmPassword = ref(false)
 const isPasswordValid = computed(() => isValidPassword(password.value))
 const doPasswordsMatch = computed(() => password.value === passwordConfirmation.value)
 
@@ -55,10 +57,22 @@ const submitReset = async () => {
         Password must be at least 8 characters and include uppercase, lowercase, and a number or
         symbol.
       </p>
-      <input type="password" v-model="password" placeholder="New password" />
+      <input
+        type="password"
+        v-model="password"
+        :type="showPassword ? 'text' : 'password'"
+        placeholder="New password"
+      />
       <p v-if="!doPasswordsMatch" class="validation-message">Passwords do not match.</p>
-      <input type="password" v-model="passwordConfirmation" placeholder="Confirm password" />
-      <button type="submit" :disabled="!isPasswordValid || !doPasswordsMatch">Reset Password</button>
+      <input
+        type="password"
+        v-model="passwordConfirmation"
+        :type="showConfirmPassword ? 'text' : 'password'"
+        placeholder="Confirm password"
+      />
+      <button type="submit" :disabled="!isPasswordValid || !doPasswordsMatch">
+        Reset Password
+      </button>
     </form>
   </div>
 </template>
